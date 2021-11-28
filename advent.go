@@ -9,11 +9,12 @@ import (
 	"github.com/sekullbe/advent/advent6"
 	"github.com/sekullbe/advent/advent7"
 	"github.com/sekullbe/advent/advent8"
+	"github.com/sekullbe/advent/advent9"
 )
 
 func main() {
 
-	advent8.Run()
+	advent9.Run()
 
 }
 
@@ -27,4 +28,6 @@ func old() {
 	advent6.Run2()
 	advent7.Run1()
 	advent7.Run2()
+	advent8.Run()
 }
+
