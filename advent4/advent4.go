@@ -3,7 +3,8 @@ package advent4
 import (
 	_ "embed"
 	"fmt"
-	"regexp"
+
+	"github.com/sekullbe/advent/parsers"
 )
 
 //go:embed input.txt
@@ -32,7 +33,7 @@ func parsePassports(inputs string) []passportValues {
 	// lines are key:valvalval , space separated
 	var passports []passportValues
 
-	passportChunks := SplitByEmptyNewline(inputs)
+	passportChunks := parsers.SplitByEmptyNewline(inputs)
 
 	for _, chunk := range passportChunks {
 		pass := newPassportValues(chunk)
@@ -42,15 +43,4 @@ func parsePassports(inputs string) []passportValues {
 	_ = passportChunks
 
 	return passports
-}
-
-func SplitByEmptyNewline(str string) []string {
-	strNormalized := regexp.
-		MustCompile("\r\n").
-		ReplaceAllString(str, "\n")
-
-	return regexp.
-		MustCompile(`\n\s*\n`).
-		Split(strNormalized, -1)
-
 }

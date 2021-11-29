@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sekullbe/advent/advent4"
+	"github.com/sekullbe/advent/parsers"
 )
 
 //go:embed input.txt
@@ -13,7 +13,7 @@ var inputs string
 
 func Run1() {
 
-	groupResponses := advent4.SplitByEmptyNewline(inputs)
+	groupResponses := parsers.SplitByEmptyNewline(inputs)
 	sumResponses := 0
 	for _, respons := range groupResponses {
 		seenResponses := make(map[rune]bool)
@@ -35,7 +35,7 @@ func Run2() {
 }
 
 func run2_doit(inp string) int {
-	groupResponses := advent4.SplitByEmptyNewline(inp)
+	groupResponses := parsers.SplitByEmptyNewline(inp)
 	sumResponses := 0
 	for _, respons := range groupResponses {
 		matches := countMatchesInString(respons)
