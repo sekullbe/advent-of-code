@@ -5,6 +5,7 @@ import (
 	"github.com/sekullbe/advent/advent10"
 	"github.com/sekullbe/advent/advent11"
 	"github.com/sekullbe/advent/advent12"
+	"github.com/sekullbe/advent/advent13"
 	"github.com/sekullbe/advent/advent2"
 	"github.com/sekullbe/advent/advent3"
 	"github.com/sekullbe/advent/advent4"
@@ -16,7 +17,7 @@ import (
 )
 
 func main() {
-	advent12.Run()
+	advent13.Run()
 }
 
 func old() {
@@ -33,5 +34,6 @@ func old() {
 	advent9.Run()
 	advent10.Run()
 	advent11.Run()
+	advent12.Run()
 }
 
