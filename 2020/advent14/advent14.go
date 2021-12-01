@@ -1,4 +1,4 @@
-package advent14
+package main
 
 import (
 	_ "embed"
@@ -13,7 +13,7 @@ var inputText string
 
 type memory map[int]int
 
-func Run() {
+func main() {
 	run1(inputText)
 	run2(inputText)
 }
@@ -29,12 +29,12 @@ func run1(inputText string) int {
 		switch line[0:4] {
 		case "mask":
 			mask.update(line[7:])
-			fmt.Printf("Updating mask to %s\n", line[7:])
+			// fmt.Printf("Updating mask to %s\n", line[7:])
 		case "mem[":
 			addr,val := parseAddress(line)
 			val = mask.applyBitmaskToValue(val)
 			memory[addr] = val
-			fmt.Printf("mem[%d]=%d\n", addr, val)
+			// fmt.Printf("mem[%d]=%d\n", addr, val)
 		default:
 			fmt.Printf("instruction parse failure: '%s' ", line)
 		}
@@ -55,7 +55,7 @@ func parseAddress(line string) (addr int, val int) {
 	return addr,val
 }
 
-func run2(inputText string) {
+func run2(inputText string) (sum int) {
 	memory := make(memory)
 	mask := createEmptyBitmask()
 
@@ -66,17 +66,20 @@ func run2(inputText string) {
 		switch line[0:4] {
 		case "mask":
 			mask.update(line[7:])
-			fmt.Printf("Updating mask to %s\n", line[7:])
+			// fmt.Printf("Updating mask to %s\n", line[7:])
 		case "mem[":
 			addr,val := parseAddress(line)
-			addr[] = mask.applyBitmaskToAddr(addr)
-			memory[addr] = val
-			fmt.Printf("mem[%d]=%d\n", addr, val)
+			addrsToWrite := mask.applyToAddr(addr)
+			for _, a := range addrsToWrite {
+				memory[a] = val
+			}
+
+			// fmt.Printf("mem[%d]=%d\n", addr, val)
 		default:
 			fmt.Printf("instruction parse failure: '%s' ", line)
 		}
 	}
-	sum := 0
+
 	for _,v := range memory {
 		sum += v
 	}
@@ -123,27 +126,30 @@ func (mask bitmask) applyBitmaskToValue(value int) int {
 	return value
 }
 
-func (mask bitmask) applyBitmaskToAddr(addr int) []int {
-	var addrs = []int{}
+func (mask bitmask) applyToAddr(addr int) []int {
+	var floaters []int
 	for i := 0; i < 36; i++ {
-		addr := 0
 		switch mask[i] {
 		case ZERO:
-			// set the bit to zero
-			// OR with 1 to set it high then XOR with 1 to set it low
-			addr |= 1 << i
-			addr ^= 1 << i
+			// do nothing
 		case ONE:
 			// set the bit to one
 			addr |= 1 << i
 		case X:
 			// make a list of all floating indices
+			floaters = append(floaters, i)
 		}
 	}
-	// if 0 floating incides return addr only
-	// for all floaters, permute the 2^N possibilities
-	//perms := []int{addr}
-
+	// put the "base" in- it's ok that it won't be unique
+	addrs := []int{addr}
+	for _, index := range floaters {
+		for _, perm := range addrs {
+			// add the 1 and 0
+			with1 := perm | 1<<index  // OR with a shifted 1 -> 1
+			with0 := with1 ^ 1<<index // with1 XOR'ed with a shifted 1 -> 0
+			addrs = append(addrs, with1, with0)
+		}
+	}
 
 	return addrs
 }

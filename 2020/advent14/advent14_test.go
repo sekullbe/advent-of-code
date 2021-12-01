@@ -1,4 +1,4 @@
-package advent14
+package main
 
 import (
 	"testing"
@@ -67,4 +67,17 @@ func Test_parseAddress(t *testing.T) {
 			}
 		})
 	}
+}
+
+
+func Test_bitmask_applyToAddr(t *testing.T) {
+
+	mask := createBitmask("000000000000000000000000000000X1001X")
+
+	addrs := mask.applyToAddr(42)
+	assert.Contains(t, addrs,26)
+	assert.Contains(t, addrs,27)
+	assert.Contains(t, addrs,58)
+	assert.Contains(t, addrs,59)
+
 }
