@@ -56,7 +56,32 @@ func parseAddress(line string) (addr int, val int) {
 }
 
 func run2(inputText string) {
+	memory := make(memory)
+	mask := createEmptyBitmask()
 
+	for _,line := range strings.Split(inputText,"\n") {
+		if len(line) < 4 {
+			continue
+		}
+		switch line[0:4] {
+		case "mask":
+			mask.update(line[7:])
+			fmt.Printf("Updating mask to %s\n", line[7:])
+		case "mem[":
+			addr,val := parseAddress(line)
+			addr[] = mask.applyBitmaskToAddr(addr)
+			memory[addr] = val
+			fmt.Printf("mem[%d]=%d\n", addr, val)
+		default:
+			fmt.Printf("instruction parse failure: '%s' ", line)
+		}
+	}
+	sum := 0
+	for _,v := range memory {
+		sum += v
+	}
+	fmt.Printf("Sum of memory = %d\n", sum)
+	return sum
 }
 
 const (
@@ -96,6 +121,31 @@ func (mask bitmask) applyBitmaskToValue(value int) int {
 		}
 	}
 	return value
+}
+
+func (mask bitmask) applyBitmaskToAddr(addr int) []int {
+	var addrs = []int{}
+	for i := 0; i < 36; i++ {
+		addr := 0
+		switch mask[i] {
+		case ZERO:
+			// set the bit to zero
+			// OR with 1 to set it high then XOR with 1 to set it low
+			addr |= 1 << i
+			addr ^= 1 << i
+		case ONE:
+			// set the bit to one
+			addr |= 1 << i
+		case X:
+			// make a list of all floating indices
+		}
+	}
+	// if 0 floating incides return addr only
+	// for all floaters, permute the 2^N possibilities
+	//perms := []int{addr}
+
+
+	return addrs
 }
 
 func (mask bitmask) update(newMask string) {
