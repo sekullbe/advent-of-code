@@ -1,24 +1,24 @@
 package main
 
 import (
-	"github.com/sekullbe/advent/advent1"
-	"github.com/sekullbe/advent/advent10"
-	"github.com/sekullbe/advent/advent11"
-	"github.com/sekullbe/advent/advent12"
-	"github.com/sekullbe/advent/advent13"
-	"github.com/sekullbe/advent/advent14"
-	"github.com/sekullbe/advent/advent2"
-	"github.com/sekullbe/advent/advent3"
-	"github.com/sekullbe/advent/advent4"
-	"github.com/sekullbe/advent/advent5"
-	"github.com/sekullbe/advent/advent6"
-	"github.com/sekullbe/advent/advent7"
-	"github.com/sekullbe/advent/advent8"
-	"github.com/sekullbe/advent/advent9"
+	"github.com/sekullbe/advent/2020/advent1"
+	"github.com/sekullbe/advent/2020/advent10"
+	"github.com/sekullbe/advent/2020/advent11"
+	"github.com/sekullbe/advent/2020/advent12"
+	"github.com/sekullbe/advent/2020/advent13"
+	"github.com/sekullbe/advent/2020/advent2"
+	"github.com/sekullbe/advent/2020/advent3"
+	"github.com/sekullbe/advent/2020/advent4"
+	"github.com/sekullbe/advent/2020/advent5"
+	"github.com/sekullbe/advent/2020/advent6"
+	"github.com/sekullbe/advent/2020/advent7"
+	"github.com/sekullbe/advent/2020/advent8"
+	"github.com/sekullbe/advent/2020/advent9"
 )
 
 func main() {
-	advent14.Run()
+
+
 }
 
 func old() {
