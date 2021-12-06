@@ -2,7 +2,7 @@ package main
 
 import (
 	_ "embed"
-
+	"fmt"
 )
 
 //go:embed input.txt
@@ -15,7 +15,11 @@ func main() {
 }
 
 func run1(inputText string) int {
+
+	return 0
 }
 
 func run2(inputText string) int {
+
+	return 0
 }

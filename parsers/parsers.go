@@ -21,7 +21,7 @@ func StringsWithCommasToIntSlice(inputText string) []int {
 	dataSetStr := strings.Split(inputText, ",")
 	var dataSet []int
 	for _, s := range dataSetStr {
-		if i, err := strconv.Atoi(s); err == nil {
+		if i, err := strconv.Atoi(strings.TrimSpace(s)); err == nil {
 			dataSet = append(dataSet, i)
 		}
 	}
