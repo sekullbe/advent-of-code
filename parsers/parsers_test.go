@@ -14,7 +14,11 @@ func TestSplitByEmptyNewline(t *testing.T) {
 		args args
 		want []string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "basic",
+			args: args{str: "foo\n\nbar\n\nbaz\nquux"},
+			want: []string{"foo", "bar", "baz\nquux"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -34,7 +38,11 @@ func TestSplitByLines(t *testing.T) {
 		args args
 		want []string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "basic",
+			args: args{str: "foo\nbar\nbaz"},
+			want: []string{"foo", "bar", "baz"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -54,7 +62,11 @@ func TestStringsToIntSlice(t *testing.T) {
 		args args
 		want []int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "two lines, trailing newlines",
+			args: args{inputText: "1 1 1 1 3\n 2 3 4 5 6\n"},
+			want: []int{1, 1, 1, 1, 3, 2, 3, 4, 5, 6},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
