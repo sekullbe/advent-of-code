@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/sekullbe/advent/parsers"
-	"log"
+	"github.com/sekullbe/advent/tools"
 	"math"
 	"sort"
 )
@@ -87,26 +87,22 @@ func memorized(fn FuncIntInt) FuncIntInt {
 		}
 		result := fn(input)
 		cache[input] = result
-		log.Printf("added n=%d result=%d to cache", input, result)
+		//log.Printf("added n=%d result=%d to cache", input, result)
 		return result
 	}
 }
 
 func sumsOfDifferences(center int, nums []int) (sum int) {
 	for _, num := range nums {
-		sum += absint(num - center)
+		sum += tools.AbsInt(num - center)
 	}
 	return
 }
 
 func pyramidSumsOfDifferences(center int, nums []int) (sum int) {
 	for _, num := range nums {
-		sum += pyrMem(absint(num - center))
-		//sum += pyramid(absint(num - center))
+		sum += pyrMem(tools.AbsInt(num - center))
+		//sum += pyramid(AbsInt(num - center))
 	}
 	return
-}
-
-func absint(i int) int {
-	return int(math.Abs(float64(i)))
 }

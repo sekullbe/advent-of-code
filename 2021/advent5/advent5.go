@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/sekullbe/advent/parsers"
-	"math"
+	"github.com/sekullbe/advent/tools"
 	"regexp"
 	"sort"
 	"strconv"
@@ -89,7 +89,7 @@ func pointsInLine(x1, y1, x2, y2 int) []point {
 		}
 		// we know |x1-x2| == |y1-y2|
 		for i := 0; ; i += xj {
-			points = append(points, point{x: x1 + i, y: y1 + absint(i)*yj})
+			points = append(points, point{x: x1 + i, y: y1 + tools.AbsInt(i)*yj})
 			if x1+i == x2 {
 				break
 			}
@@ -97,10 +97,6 @@ func pointsInLine(x1, y1, x2, y2 int) []point {
 	}
 
 	return points
-}
-
-func absint(i int) int {
-	return int(math.Abs(float64(i)))
 }
 
 func setUpChart() chart {

@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/sekullbe/advent/parsers"
-	"math"
+	"github.com/sekullbe/advent/tools"
 	"strings"
 )
 
@@ -24,16 +24,16 @@ func run1(inputText string) int {
 		inputs, outputs := parseLine(s)
 		_ = inputs
 		for _, output := range outputs {
-			if contains(output.possibleNums, 1) {
+			if tools.ContainsInt(output.possibleNums, 1) {
 				countOfEasyNumbers++
 			}
-			if contains(output.possibleNums, 4) {
+			if tools.ContainsInt(output.possibleNums, 4) {
 				countOfEasyNumbers++
 			}
-			if contains(output.possibleNums, 7) {
+			if tools.ContainsInt(output.possibleNums, 7) {
 				countOfEasyNumbers++
 			}
-			if contains(output.possibleNums, 8) {
+			if tools.ContainsInt(output.possibleNums, 8) {
 				countOfEasyNumbers++
 			}
 		}
@@ -49,7 +49,7 @@ func run2(inputText string) int {
 		num := 0
 		for i, output := range outputs {
 			n := deductions[output.pattern]
-			num += powInt(10, 3-i) * n
+			num += tools.PowInt(10, 3-i) * n
 		}
 		total += num
 	}
@@ -109,7 +109,7 @@ func deduceCodes(inputs []digitPattern) map[string]int {
 		// need to get the four elts that are not one elts
 		if input.num == 4 {
 			for _, r := range input.pattern {
-				if !containsRune(oneElts, r) {
+				if !tools.ContainsRune(oneElts, r) {
 					fourElts = append(fourElts, r)
 				}
 			}
@@ -120,8 +120,8 @@ func deduceCodes(inputs []digitPattern) map[string]int {
 			deductions[input.pattern] = input.num
 			continue
 		}
-		eltsInOne := countElementsInString(oneElts, input.pattern)
-		eltsInFour := countElementsInString(fourElts, input.pattern)
+		eltsInOne := tools.CountElementsInString(oneElts, input.pattern)
+		eltsInFour := tools.CountElementsInString(fourElts, input.pattern)
 		if len(input.pattern) == 5 {
 			if eltsInOne == 1 && eltsInFour == 1 {
 				deductions[input.pattern] = 2
@@ -164,36 +164,4 @@ func parseLine(line string) (inputs []digitPattern, outputs []digitPattern) {
 		}
 	}
 	return
-}
-
-// utility functions that might want to be factored out
-func countElementsInString(elts []rune, s string) (count int) {
-	for _, r := range s {
-		if containsRune(elts, r) {
-			count++
-		}
-	}
-	return count
-}
-
-func contains(s []int, n int) bool {
-	for _, v := range s {
-		if v == n {
-			return true
-		}
-	}
-	return false
-}
-
-func containsRune(s []rune, r rune) bool {
-	for _, v := range s {
-		if v == r {
-			return true
-		}
-	}
-	return false
-}
-
-func powInt(x, y int) int {
-	return int(math.Pow(float64(x), float64(y)))
 }
