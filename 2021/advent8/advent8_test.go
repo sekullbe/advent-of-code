@@ -17,32 +17,32 @@ func Test_newDigitPattern(t *testing.T) {
 		{
 			name: "1",
 			args: args{p: "cf"},
-			want: digitPattern{pattern: "cf", possibleNums: []int{1}, num: 1},
+			want: digitPattern{pattern: "cf", num: 1},
 		},
 		{
 			name: "235",
 			args: args{p: "acedg"},
-			want: digitPattern{pattern: "acdeg", possibleNums: []int{2, 3, 5}, num: -1},
+			want: digitPattern{pattern: "acdeg", num: -1},
 		},
 		{
 			name: "4",
 			args: args{p: "bcdf"},
-			want: digitPattern{pattern: "bcdf", possibleNums: []int{4}, num: 4},
+			want: digitPattern{pattern: "bcdf", num: 4},
 		},
 		{
 			name: "7",
 			args: args{p: "acf"},
-			want: digitPattern{pattern: "acf", possibleNums: []int{7}, num: 7},
+			want: digitPattern{pattern: "acf", num: 7},
 		},
 		{
 			name: "690",
 			args: args{p: "abcefg"},
-			want: digitPattern{pattern: "abcefg", possibleNums: []int{6, 9, 0}, num: -1},
+			want: digitPattern{pattern: "abcefg", num: -1},
 		},
 		{
 			name: "8",
 			args: args{p: "abcdefg"},
-			want: digitPattern{pattern: "abcdefg", possibleNums: []int{8}, num: 8},
+			want: digitPattern{pattern: "abcdefg", num: 8},
 		},
 	}
 	for _, tt := range tests {
@@ -67,8 +67,8 @@ func Test_parseLine(t *testing.T) {
 		{
 			name:        "example",
 			args:        args{line: "be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe"},
-			wantInputs:  []digitPattern{{"be", []int{1}, 1}, {"abcdefg", []int{8}, 8}, {"bcdefg", []int{6, 9, 0}, -1}, {"acdefg", []int{6, 9, 0}, -1}, {"bceg", []int{4}, 4}, {"cdefg", []int{2, 3, 5}, -1}, {"abdefg", []int{6, 9, 0}, -1}, {"bcdef", []int{2, 3, 5}, -1}, {"abcdf", []int{2, 3, 5}, -1}, {"bde", []int{7}, 7}},
-			wantOutputs: []digitPattern{{"abcdefg", []int{8}, 8}, {"bcdef", []int{2, 3, 5}, -1}, {"bcdefg", []int{6, 9, 0}, -1}, {"bceg", []int{4}, 4}},
+			wantInputs:  []digitPattern{{"be", 1}, {"abcdefg", 8}, {"bcdefg", -1}, {"acdefg", -1}, {"bceg", 4}, {"cdefg", -1}, {"abdefg", -1}, {"bcdef", -1}, {"abcdf", -1}, {"bde", 7}},
+			wantOutputs: []digitPattern{{"abcdefg", 8}, {"bcdef", -1}, {"bcdefg", -1}, {"bceg", 4}},
 		},
 	}
 	for _, tt := range tests {

@@ -24,16 +24,7 @@ func run1(inputText string) int {
 		inputs, outputs := parseLine(s)
 		_ = inputs
 		for _, output := range outputs {
-			if tools.ContainsInt(output.possibleNums, 1) {
-				countOfEasyNumbers++
-			}
-			if tools.ContainsInt(output.possibleNums, 4) {
-				countOfEasyNumbers++
-			}
-			if tools.ContainsInt(output.possibleNums, 7) {
-				countOfEasyNumbers++
-			}
-			if tools.ContainsInt(output.possibleNums, 8) {
+			if output.num > -1 {
 				countOfEasyNumbers++
 			}
 		}
@@ -57,38 +48,28 @@ func run2(inputText string) int {
 }
 
 type digitPattern struct {
-	pattern      string
-	possibleNums []int
-	num          int // -1 until we know it for sure
+	pattern string
+	num     int // -1 until we know it for sure
 }
 
 func newDigitPattern(p string) digitPattern {
 	dp := digitPattern{pattern: SortString(p), num: -1}
 	switch len(p) {
 	case 2:
-		dp.possibleNums = []int{1}
 		dp.num = 1
 	case 3:
-		dp.possibleNums = []int{7}
 		dp.num = 7
 	case 4:
-		dp.possibleNums = []int{4}
 		dp.num = 4
-	case 5:
-		dp.possibleNums = []int{2, 3, 5}
-	case 6:
-		dp.possibleNums = []int{6, 9, 0}
 	case 7:
-		dp.possibleNums = []int{8}
 		dp.num = 8
 	default:
-		panic("impossible digit pattern: " + p)
+		dp.num = -1 // we can't know yet
 	}
-
 	return dp
 }
 
-// really only useful for testing
+// really only useful for testing, so I can feed in tex lines instead of manually creating []digitPattern{...}s
 func deduceCodesFromInputLine(line string) map[string]int {
 	inputs, _ := parseLine(line)
 	return deduceCodes(inputs)
@@ -104,7 +85,7 @@ func deduceCodes(inputs []digitPattern) map[string]int {
 			oneElts = append(oneElts, rune(input.pattern[1]))
 		}
 	}
-	// gratuitiously inefficient but I do not care
+	// gratuitously inefficient but I do not care
 	for _, input := range inputs {
 		// need to get the four elts that are not one elts
 		if input.num == 4 {
@@ -132,9 +113,7 @@ func deduceCodes(inputs []digitPattern) map[string]int {
 			if eltsInOne == 1 && eltsInFour == 2 {
 				deductions[input.pattern] = 5
 			}
-			continue
-		}
-		if len(input.pattern) == 6 {
+		} else if len(input.pattern) == 6 {
 			if eltsInOne == 1 && eltsInFour == 2 {
 				deductions[input.pattern] = 6
 			}
@@ -144,11 +123,11 @@ func deduceCodes(inputs []digitPattern) map[string]int {
 			if eltsInOne == 2 && eltsInFour == 1 {
 				deductions[input.pattern] = 0
 			}
-			continue
 		}
 	}
 	return deductions
 }
+
 func parseLine(line string) (inputs []digitPattern, outputs []digitPattern) {
 	inputMode := true
 	for _, s := range strings.Fields(line) {
