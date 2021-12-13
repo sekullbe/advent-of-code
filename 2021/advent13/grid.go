@@ -56,7 +56,7 @@ func (g grid) movePoint(from, to point) error {
 
 func (g grid) fold(axis string, foldCoord int) {
 	foldx := axis == "x" // else foldLeft
-	//log.Printf("Folding on x=%d; maxX = %d, maxY = %d", foldCoord, g.maxX(), g.maxY())
+	//log.Printf("Folding on %s=%d; maxX = %d, maxY = %d", axis, foldCoord, g.maxX(), g.maxY())
 	for p1 := range g {
 		if !g[p1] {
 			continue // the point was unset
