@@ -146,7 +146,6 @@ func Test_countElementsInPairs(t *testing.T) {
 	type args struct {
 		pc    pairCount
 		first string
-		last  string
 	}
 	tests := []struct {
 		name string
@@ -156,29 +155,29 @@ func Test_countElementsInPairs(t *testing.T) {
 		{
 			name: "example NNCB",
 			args: args{pc: pairCount{elementPair{"N", "N"}: 1, elementPair{"N", "C"}: 1, elementPair{"C", "B"}: 1},
-				first: "N", last: "B",
+				first: "N",
 			},
 			want: map[string]int{"N": 2, "C": 1, "B": 1},
 		},
 		{
 			name: "example NBCCNBBBCBHCB",
-			args: args{pc: initializePairs("NBCCNBBBCBHCB"), first: "N", last: "B"},
+			args: args{pc: initializePairs("NBCCNBBBCBHCB"), first: "N"},
 			want: map[string]int{"N": 2, "C": 4, "B": 6, "H": 1},
 		},
 		{
 			name: "real template OKSBBKHFBPVNOBKHBPCO - did not count last O",
-			args: args{pc: initializePairs("OKSBBKHFBPVNOBKHBPCO"), first: "O", last: "O"},
+			args: args{pc: initializePairs("OKSBBKHFBPVNOBKHBPCO"), first: "O"},
 			want: map[string]int{"B": 5, "C": 1, "F": 1, "H": 2, "K": 3, "N": 1, "O": 3, "P": 2, "S": 1, "V": 1},
 		},
 		{
 			name: "first and last match undercounts NBCN",
-			args: args{pc: initializePairs("NBCN"), first: "N", last: "N"},
+			args: args{pc: initializePairs("NBCN"), first: "N"},
 			want: map[string]int{"N": 2, "C": 1, "B": 1},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, countElementsInPairs(tt.args.pc, tt.args.first, tt.args.last), "countElementsInPairs(%v)", tt.args.pc)
+			assert.Equalf(t, tt.want, countElementsInPairs(tt.args.pc, tt.args.first), "countElementsInPairs(%v)", tt.args.pc)
 		})
 	}
 }

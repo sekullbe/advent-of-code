@@ -31,7 +31,7 @@ func run(inputText string, steps int) int {
 	pairCounts := polymerize(template, theRules, steps)
 
 	// count the elts in the pairs, and get the most and least common
-	eltCounts := countElementsInPairs(pairCounts, string(template[0]), string(template[len(template)-1]))
+	eltCounts := countElementsInPairs(pairCounts, string(template[0]))
 	maxCount := 0
 	minCount := math.MaxInt
 	for _, c := range eltCounts {
@@ -45,20 +45,13 @@ func run(inputText string, steps int) int {
 	return maxCount - minCount
 }
 
-func countElementsInPairs(pc pairCount, first, last string) map[string]int {
+func countElementsInPairs(pc pairCount, first string) map[string]int {
 	ec := make(map[string]int)
 	for pair, c := range pc {
-		ec[pair.e1] += c
 		ec[pair.e2] += c
 	}
-	// adjust for first and last because they were each only counted once
+	// adjust for first because it's counted only once
 	ec[first]++
-	ec[last]++
-
-	// because they're pairs, we've seen them all twice
-	for e, c := range ec {
-		ec[e] = c / 2
-	}
 	return ec
 }
 
