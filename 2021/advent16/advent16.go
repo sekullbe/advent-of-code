@@ -65,6 +65,7 @@ func parsePacket(buf *bytes.Buffer) (versionSum, value int, err error) {
 func parseOperatorPacketContents(typeId int, buf *bytes.Buffer) (versionSum, value int) {
 	subpacketIndicator, _ := buf.ReadByte()
 	var values []int
+	// Could split these into two functions but meh, if I'm not going to bother writing tests for them, no need.
 	if subpacketIndicator == ZERO {
 		// the next 15 bits are a number, NOT using the literal system
 		subpacketLength := binaryStringInBytesToInt(buf.Next(15))
@@ -93,9 +94,14 @@ func parseOperatorPacketContents(typeId int, buf *bytes.Buffer) (versionSum, val
 		}
 	}
 	// now we have the values of the subpackets, do the operation
+	value = operateOnValues(typeId, values)
+	return versionSum, value
+}
+
+func operateOnValues(typeId int, values []int) (value int) {
 	if len(values) == 0 {
 		log.Println("ERROR: operator with no subpackets, how did that happen")
-		return versionSum, 0
+		return 0
 	}
 	switch typeId {
 	case 0: // sum values
@@ -126,7 +132,7 @@ func parseOperatorPacketContents(typeId int, buf *bytes.Buffer) (versionSum, val
 			value = 1
 		}
 	}
-	return versionSum, value
+	return
 }
 
 func parseLiteralValue(buf *bytes.Buffer) int {
