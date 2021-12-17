@@ -124,6 +124,16 @@ func Test_run1(t *testing.T) {
 			args: args{inputText: "target area: x=20..30, y=-10..-5"},
 			want: 45,
 		},
+		{
+			name: "edge case from reddit",
+			args: args{inputText: "target area: x=34..35, y=-8..-6"},
+			want: 3,
+		},
+		{
+			name: "edge case from reddit 2",
+			args: args{inputText: "target area: x=352..377, y=-49..-30"},
+			want: 66,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
