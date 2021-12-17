@@ -32,10 +32,9 @@ func main() {
 func run1(inputText string) int {
 
 	target := parseTarget(inputText)
-	possibleDx := target.findPossibleDxRange(0)
 	maxYSoFar := 0
-	for dy := 0; dy < 1000; dy++ {
-		for _, dx := range possibleDx {
+	for _, dy := range target.findPossibleDyRange() {
+		for _, dx := range target.findPossibleDxRange() {
 			s := shot{x: 0, y: 0, dx: dx, dy: dy}
 			hit, maxY := launch(s, target)
 			if hit {
@@ -51,10 +50,10 @@ func run1(inputText string) int {
 
 func run2(inputText string) int {
 	target := parseTarget(inputText)
-	possibleDx := target.findPossibleDxRange(0)
 	count := 0
-	for dy := -1000; dy < 10000; dy++ {
-		for _, dx := range possibleDx {
+
+	for _, dy := range target.findPossibleDyRange() {
+		for _, dx := range target.findPossibleDxRange() {
 			s := shot{x: 0, y: 0, dx: dx, dy: dy}
 			hit, _ := launch(s, target)
 			if hit {
@@ -80,8 +79,8 @@ func launch(s shot, t target) (bool, int) {
 	return false, 0
 }
 
-func (t target) findPossibleDxRange(initX int) (velocities []int) {
-	for i := 1; i <= t.maxX-initX; i++ {
+func (t target) findPossibleDxRange() (velocities []int) {
+	for i := 1; i <= t.maxX; i++ {
 		x := i
 		for j := i - 1; j >= 0; j-- {
 			if x >= t.minX && x <= t.maxX && !tools.ContainsInt(velocities, i) {
@@ -93,8 +92,8 @@ func (t target) findPossibleDxRange(initX int) (velocities []int) {
 	return
 }
 
-func (t target) findPossibleDyRange(initY int) (velocities []int) {
-	for dy := 0; dy < t.minY; dy-- {
+func (t target) findPossibleDyRange() (velocities []int) {
+	for dy := -tools.AbsInt(t.minY) - 1; dy <= tools.AbsInt(t.minY)+1; dy++ {
 		velocities = append(velocities, dy)
 	}
 	return

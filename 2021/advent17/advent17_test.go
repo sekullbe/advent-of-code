@@ -87,13 +87,11 @@ func Test_target_findPossibleDxRange(t1 *testing.T) {
 	tests := []struct {
 		name           string
 		fields         fields
-		args           args
 		wantVelocities []int
 	}{
 		{
 			name:           "10-30",
 			fields:         fields{10, 12, 0, 0},
-			args:           args{0},
 			wantVelocities: []int{4, 5, 6, 10, 11, 12},
 		},
 	}
@@ -105,7 +103,7 @@ func Test_target_findPossibleDxRange(t1 *testing.T) {
 				minY: tt.fields.minY,
 				maxY: tt.fields.maxY,
 			}
-			if gotVelocities := t.findPossibleDxRange(tt.args.initX); !reflect.DeepEqual(gotVelocities, tt.wantVelocities) {
+			if gotVelocities := t.findPossibleDxRange(); !reflect.DeepEqual(gotVelocities, tt.wantVelocities) {
 				t1.Errorf("findPossibleDxRange() = %v, want %v", gotVelocities, tt.wantVelocities)
 			}
 		})
@@ -131,6 +129,39 @@ func Test_run1(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := run1(tt.args.inputText); got != tt.want {
 				t.Errorf("run1() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_target_findPossibleDyRange(t1 *testing.T) {
+	type fields struct {
+		minX int
+		maxX int
+		minY int
+		maxY int
+	}
+	tests := []struct {
+		name           string
+		fields         fields
+		wantVelocities []int
+	}{
+		{
+			name:           "basic",
+			fields:         fields{0, 0, -10, -5},
+			wantVelocities: []int{-11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+		},
+	}
+	for _, tt := range tests {
+		t1.Run(tt.name, func(t1 *testing.T) {
+			t := target{
+				minX: tt.fields.minX,
+				maxX: tt.fields.maxX,
+				minY: tt.fields.minY,
+				maxY: tt.fields.maxY,
+			}
+			if gotVelocities := t.findPossibleDyRange(); !reflect.DeepEqual(gotVelocities, tt.wantVelocities) {
+				t1.Errorf("findPossibleDyRange() = %v, want %v", gotVelocities, tt.wantVelocities)
 			}
 		})
 	}
