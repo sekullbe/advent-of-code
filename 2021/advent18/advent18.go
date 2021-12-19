@@ -35,7 +35,7 @@ func run2(inputText string) int {
 	nums := parsers.SplitByLines(inputText)
 	pairs := getAllNumPairs(nums)
 	for _, pair := range pairs {
-		mag := magnitude(repeatAdd([]string{pair.one, pair.two}))
+		mag := magnitude(add(pair.one, pair.two))
 		if mag > maxMagnitude {
 			maxMagnitude = mag
 		}
@@ -60,7 +60,7 @@ func magnitude(num string) int {
 		mag, _ := strconv.Atoi(num)
 		return mag
 	}
-	return 3*magnitude(elts[0]) + 2*magnitude(elts[1][0:len(elts[1])])
+	return 3*magnitude(elts[0]) + 2*magnitude(elts[1])
 }
 
 // returns the pairs and strips the outer [ and ]
@@ -179,7 +179,7 @@ func explodeAtIndex(num string, explodo int) string {
 	l := seekLeftAndReplace(num[:explodo], left)
 	r := seekRightAndReplace(num[explodo+explodoPairLength:], right)
 
-	return l + "0" + r
+	return fmt.Sprintf("%s0%s", l, r)
 }
 
 func seekLeftAndReplace(num string, newNum int) string {
