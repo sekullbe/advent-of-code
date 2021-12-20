@@ -124,19 +124,6 @@ func enhancePixel(im image, p pixel, a algorithm, bg bool) (lit bool) {
 	return a[enhanceKey]
 }
 
-// this does not work because it looks only at the pixels in the image, not neighbors
-// that's particularly messed up if algorithm[0] is # because that'll light up the entire empty space...
-// so loop over say -5 to +5
-/*
-func enhanceOld(im image, a algorithm) (newImage image) {
-	newImage = make(image)
-	for p, _ := range im {
-		newImage[p] = enhancePixel(im, p, a)
-	}
-	return newImage
-}
-*/
-
 func enhance(im image, a algorithm, bg bool) (newImage image) {
 	fillInPixels(&im, bg)
 	newImage.pixels = make(pixels)
@@ -153,14 +140,34 @@ func fillInPixels(im *image, bg bool) {
 	im.max += 1
 
 	for r := im.min; r < im.max; r++ {
-		for c := im.min; c < im.max; c++ {
+		if r == im.min || r == im.max-1 {
+			for c := im.min; c < im.max; c++ {
+				_, known := im.pixels[pixel{r, c}]
+				//log.Printf("max=%d min=%d row=%d col=%d", im.max, im.min, r, c)
+				if !known {
+					p := pixel{r, c}
+					im.pixels[p] = bg
+				}
+			}
+		} else {
+			c := im.min
 			_, known := im.pixels[pixel{r, c}]
+			//log.Printf("max=%d min=%d row=%d col=%d", im.max, im.min, r, c)
+			if !known {
+				p := pixel{r, c}
+				im.pixels[p] = bg
+			}
+			c = im.max - 1
+			_, known = im.pixels[pixel{r, c}]
+			//log.Printf("max=%d min=%d row=%d col=%d", im.max, im.min, r, c)
 			if !known {
 				p := pixel{r, c}
 				im.pixels[p] = bg
 			}
 		}
+
 	}
+	//log.Println("-----")
 }
 
 func printImage(im image) {
