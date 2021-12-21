@@ -3,7 +3,7 @@ package main
 type player struct {
 	id       int
 	score    int
-	boardpos int // stored as 0-9 but the real number is 1-10
+	boardpos int 
 }
 
 func newPlayer(id int, position int) *player {
@@ -26,6 +26,8 @@ func (p *player) move(moves int) {
 func (p player) pos() int {
 	return p.boardpos + 1
 }
+
+// for part 2 - these probably don't belong here, but meh.
 
 type playerstate struct {
 	pos, score int
