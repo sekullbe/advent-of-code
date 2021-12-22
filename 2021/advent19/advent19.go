@@ -133,8 +133,8 @@ func findBestScannerMatchingFingerprint(f0 fingerprint, scanners []*scanner) (ma
 		m       []twoBeaconPairs
 	}
 	matchers := make(map[int]mcount)
+	setFingerprints(scanners)
 	for _, s := range scanners {
-		setFingerprints(scanners)
 		match, matches = matchFingerprints(f0, s.fingerprint, 12)
 		if match {
 			matchers[s.id] = mcount{len(matches), s, matches}
@@ -161,6 +161,9 @@ func matchFingerprints(f0, f1 fingerprint, overlap int) (bool, []twoBeaconPairs)
 	// a fingerprint is a map of about b^2 pairs
 	// it's a match if there are 12 distances in f0 that are also in f1
 	for f0p, f0f := range f0 {
+		if f0f > 252 {
+			continue // f0f comes from scanner 0 that could have fingerprints all over the place, but if they're far apart they won't be in F1
+		}
 		for f1p, f1f := range f1 {
 			if f0f == f1f {
 				matchCount++
@@ -172,62 +175,3 @@ func matchFingerprints(f0, f1 fingerprint, overlap int) (bool, []twoBeaconPairs)
 	//log.Printf("Fingerprint matches: %d", matchCount)
 	return matchCount >= overlap, matches
 }
-
-/*
-start at s0
-look at each scanner s1...
-check for overlaps
-do this by matching fingerprints between s0 and sn
-if you have a match, you know s0 and sn overlap, and you have a pair of matching beacons
-
-rotate and translate sn until yu get the matches, then put all of the beacons into s0
-lather rinse repeat
-
-
-*/
-
-/*
-so... how to do this?
-start with scanner 0- it is at the origin and defines the coordinate system
-get its lists of rotated points?
-
-take a new scanner
-take its lists of rotated points
-There are 30 scanners which means the absolutely max coordinate is +/- 60000
- -- if the beacons and scanners were in a perfect line each scanner would be 2000 away from the next; add 1 for paranoia
-fuck, i don't want to do a loop over 2E14 possibilities, how to constrain that?
-obviously we'll cut short once 12 beacons are found
-
-use the distance between beacons in a set as a fingerprint
-
-calculate distances between each pair of beacons in the scanner - do you need to store xyz or can you store the float?
-now compare each pair in s0 with s1
-if you find 11 overlaps,  you know that those two beacons can merge the scanners
-
-my fingerprints are bad
-for every beacon in S0 you need to store the distances to every other beacon in S0, not the sum to ALL in S0
-so a fingerprint is a map from beaconpair to float
-
-
-
------
-Given a group of beacons belonging to a scanner, calculate the set of absolute distances to all other beacons in the group
-(throwing away position and sign information). So for the first two beacons of the first group, the set of distances would
-be 81, 1, 163, though the order does no longer matter. I stored these in a frozenset in Python. Now, for each beacon, you
-have a collection of distances to other beacons in the same group.
-
-Now compare two scanner groups, and for each pair of beacons, check the number of distance-sets that overlap. If that is
-at least 11, you know at least 12 beacons overlap, and you can use those two beacons as reference points to merge the
-scanner groups. Theoretically you could have some false positives, as you throw away sign information, but in practice
-this won't lead to problems.
-
-Now given the reference points in the previous step, find another beacon that is present in both scanner groups. It
-should not have the same x, y or z as the reference beacon (distance-set should not contain 0) and should be unique
-within the set. You can use this to determine the orientation of the second scanner group relative to the first.
-
-To merge both sets, for every beacon in the second group, rotate it using the previously determined orientation, then
-translate it by the difference in scanner positions. If the new beacon position is not present in the first group, add
-it to the first group. Finally, remove the second group and recalculate the distance-sets.
-
-
-*/

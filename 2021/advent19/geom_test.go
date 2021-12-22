@@ -80,3 +80,9 @@ func Test_manhattanDistance(t *testing.T) {
 		})
 	}
 }
+
+func TestDistance(t *testing.T) {
+	b0 := beacon{-1000, -1000, -1000}
+	b1 := beacon{1000, 1000, 1000}
+	assert.Equal(t, 3464.1016151377544, dist(b0, b1))
+}
