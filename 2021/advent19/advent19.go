@@ -47,7 +47,6 @@ func run1(inputText string) (int, int) {
 		locatedScanners = append(locatedScanners, matchingScanner.location)
 		scannersToMatch = removeMatchedScanner(matchingScanner, scannersToMatch)
 	}
-	log.Printf("done!")
 
 	return len(s0.beacons), calcMaxManhattanDistance(locatedScanners)
 }
@@ -82,10 +81,9 @@ func matchScanner(s0 *scanner, matchingScanner *scanner, matches []twoBeaconPair
 				// if this is true, we know how to align s0 and matchingscanner
 				match := checkBeaconMatch(s0.beacons, translatedBeacons, 12)
 				if match {
-					//log.Printf("rotation type %d", rotType)
 					x, y, z := calculateBeaconDiff(newBp.p1, newBp.p2)
 					log.Printf("Beacons aligned: translation %d,%d,%d", x, y, z)
-					// So now we know the rotType and x,y,z translation to line up matchingScanner.id with s0
+					// So now we know the rotType and x,y,z translation to line up matchingScanner with s0
 					return rotType, x, y, z, rotatedBeacons
 				}
 			}

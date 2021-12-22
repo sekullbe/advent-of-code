@@ -237,24 +237,30 @@ func (s *scanner) calculateDistanceFingerprint(recalculate bool) fingerprint {
 	if len(s.fingerprint) > 0 && !recalculate {
 		return s.fingerprint
 	}
-	fingerprint := make(fingerprint)
+
+	var fp fingerprint
+	if recalculate {
+		fp = s.fingerprint
+	} else {
+		fp = make(fingerprint)
+	}
 	for _, b1 := range s.beacons {
 		for _, b2 := range s.beacons {
 			if b1 == b2 {
 				continue
 			}
 			// Remove duplicates
-			_, fpb1b2 := fingerprint[beaconPair{b1, b2}]
-			_, fpb2b1 := fingerprint[beaconPair{b2, b1}]
+			_, fpb1b2 := fp[beaconPair{b1, b2}]
+			_, fpb2b1 := fp[beaconPair{b2, b1}]
 			if fpb1b2 || fpb2b1 {
 				continue
 			}
 			d := dist(b1, b2)
-			fingerprint[beaconPair{b1, b2}] = d
+			fp[beaconPair{b1, b2}] = d
 		}
 	}
-	s.fingerprint = fingerprint
-	return fingerprint
+	s.fingerprint = fp
+	return fp
 }
 
 func calcMaxManhattanDistance(points []beacon) int {
