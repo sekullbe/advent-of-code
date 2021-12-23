@@ -1,6 +1,10 @@
 package tools
 
-import "math"
+import (
+	"log"
+	"math"
+	"strconv"
+)
 
 // yes I know 'util' etc is bad practice as a package
 // so maybe I'll refactor this as I split things up
@@ -38,4 +42,29 @@ func PowInt(x, y int) int {
 
 func AbsInt(i int) int {
 	return int(math.Abs(float64(i)))
+}
+
+// inlineable atoi
+func Atoi(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		log.Panicf("bad atoi: %s", s)
+	}
+	return i
+}
+
+func MinInt(a, b int) int {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func MaxInt(a, b int) int {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
 }
