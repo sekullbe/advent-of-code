@@ -8,7 +8,6 @@ import (
 )
 
 func TestStep(t *testing.T) {
-	initialize()
 	initialState := &state{
 		cost: 0,
 		rooms: []room{
@@ -22,8 +21,35 @@ func TestStep(t *testing.T) {
 	assert.Equal(t, 46, c)
 }
 
+func TestBuriedMover(t *testing.T) {
+	initialState := &state{
+		cost: 0,
+		rooms: []room{
+			room{0, []int{A, B}},
+			room{0, []int{B, A}},
+			room{0, []int{C, C}},
+			room{0, []int{D, D}}},
+		corridor: corridor{-1, -1, -1, -1, -1, -1, -1},
+	}
+	c := begin(initialState)
+	assert.Equal(t, 112, c)
+}
+
+func TestScore(t *testing.T) {
+	initialState := &state{
+		cost: 0,
+		rooms: []room{
+			room{0, []int{A, A}},
+			room{0, []int{B}},
+			room{0, []int{C, C}},
+			room{0, []int{D, D}}},
+		corridor: corridor{-1, -1, B, -1, -1, -1, -1},
+	}
+	c := begin(initialState)
+	assert.Equal(t, 20, c)
+}
+
 func TestStep2(t *testing.T) {
-	initialize()
 	initialState := &state{
 		cost: 0,
 		rooms: []room{
@@ -34,10 +60,9 @@ func TestStep2(t *testing.T) {
 		corridor: corridor{-1, -1, -1, -1, -1, -1, -1},
 	}
 	c := begin(initialState)
-	assert.Equal(t, 4600, c)
+	assert.Equal(t, 4646, c)
 }
 func TestStep3(t *testing.T) {
-	initialize()
 	initialState := &state{
 		cost: 0,
 		rooms: []room{
@@ -52,7 +77,6 @@ func TestStep3(t *testing.T) {
 }
 
 func TestExample(t *testing.T) {
-	initialize()
 	initialState := &state{
 		cost: 0,
 		rooms: []room{
@@ -71,10 +95,9 @@ func TestExample(t *testing.T) {
 	assert.Equal(t, 12521, c)
 }
 
-// I'm tired and can't be arsed to write parsing code, so if people can do the whole
-//puzzle by hand I can enter the inputsn by hand.
+// I'm tired and can't be bothered to write parsing code, so if people can do the whole
+// puzzle by hand I can enter the inputs by hand.
 func Test_ForReal1(t *testing.T) {
-	initialize()
 	initialState := &state{
 		cost: 0,
 		rooms: []room{
@@ -94,7 +117,6 @@ func Test_ForReal1(t *testing.T) {
 }
 
 func Test_Example2(t *testing.T) {
-	initialize()
 	initialState := &state{
 		cost: 0,
 		rooms: []room{
@@ -104,31 +126,57 @@ func Test_Example2(t *testing.T) {
 			room{0, []int{D, A, C, A}}},
 		corridor: corridor{-1, -1, -1, -1, -1, -1, -1},
 	}
-	c := begin(initialState)
+	c := beginWithDepth(initialState, 4)
 	for k, s := range stateCache {
 		if strings.Contains(k, "-1 -1 -1 -1 -1 -1 -1") {
 			log.Printf("%s:%d", k, s)
 		}
 	}
-	assert.Equal(t, 16489, c)
+	assert.Equal(t, 44169, c)
 }
 
 func Test_ForReal2(t *testing.T) {
-	initialize()
 	initialState := &state{
 		cost: 0,
 		rooms: []room{
+			room{0, []int{D, D, D, C}},
+			room{0, []int{D, C, B, C}},
+			room{0, []int{A, B, A, B}},
+			room{0, []int{A, A, C, B}}},
+		corridor: corridor{-1, -1, -1, -1, -1, -1, -1},
+	}
+	c := beginWithDepth(initialState, 4)
+	for k, c := range stateCache {
+		if strings.Contains(k, "-1 -1 -1 -1 -1 -1 -1") {
+			log.Printf("%s:%d", k, c)
+		}
+	}
+	assert.Equal(t, 43413, c)
+}
+
+func Test_ExampleFromReddit2(t *testing.T) {
+	initialState := &state{
+		cost: 0,
+		rooms: []room{
+			room{0, []int{A, C}},
 			room{0, []int{D, C}},
-			room{0, []int{D, C}},
-			room{0, []int{A, B}},
-			room{0, []int{A, B}}},
+			room{0, []int{A, D}},
+			room{0, []int{B, B}}},
 		corridor: corridor{-1, -1, -1, -1, -1, -1, -1},
 	}
 	c := begin(initialState)
-	for k, s := range stateCache {
-		if strings.Contains(k, "-1 -1 -1 -1 -1 -1 -1") {
-			log.Printf("%s:%d", k, s)
-		}
+	assert.Equal(t, 13495, c)
+}
+func Test_ExampleFromReddit4(t *testing.T) {
+	initialState := &state{
+		cost: 0,
+		rooms: []room{
+			room{0, []int{A, D, D, C}},
+			room{0, []int{D, C, B, C}},
+			room{0, []int{A, B, A, D}},
+			room{0, []int{B, A, C, B}}},
+		corridor: corridor{-1, -1, -1, -1, -1, -1, -1},
 	}
-	assert.Equal(t, 16489, c)
+	c := beginWithDepth(initialState, 4)
+	assert.Equal(t, 53767, c)
 }

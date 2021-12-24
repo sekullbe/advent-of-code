@@ -12,7 +12,7 @@ import (
 var inputText string
 
 func main() {
-	fmt.Printf("Magic number: %d\n", run1(inputText))
+	//fmt.Printf("Magic number: %d\n", run1(inputText))
 	fmt.Println("-------------")
 	fmt.Printf("Magic number: %d\n", run2(inputText))
 }
@@ -20,6 +20,7 @@ func main() {
 //globals
 type paths map[move]howToMove
 
+var LOG bool = false
 var PATHS paths
 var stateCache map[string]int
 
@@ -33,20 +34,27 @@ func run1(inputText string) int {
 	initialState := &state{
 		cost: 0,
 		rooms: []room{
-			room{0, []int{4, 3}},
-			room{0, []int{4, 3}},
-			room{0, []int{1, 2}},
-			room{0, []int{1, 2}}},
-		corridor: corridor{0, 0, 0, 0, 0, 0, 0},
+			room{0, []int{D, C}},
+			room{0, []int{D, C}},
+			room{0, []int{A, B}},
+			room{0, []int{A, B}}},
+		corridor: corridor{-1, -1, -1, -1, -1, -1, -1},
 	}
-	cost := step(initialState)
 
-	return cost
+	return begin(initialState)
 }
 
 func run2(inputText string) int {
-
-	return 0
+	initialState := &state{
+		cost: 0,
+		rooms: []room{
+			room{0, []int{D, D, D, C}},
+			room{0, []int{D, C, B, C}},
+			room{0, []int{A, B, A, B}},
+			room{0, []int{A, A, C, B}}},
+		corridor: corridor{-1, -1, -1, -1, -1, -1, -1},
+	}
+	return beginWithDepth(initialState, 4)
 }
 
 // Don't count doors as spaces; they're just costs
@@ -60,6 +68,8 @@ const (
 	C = 2
 	D = 3
 )
+
+var ROOMDEPTH = 2
 
 var COSTS = map[int]int{A: 1, B: 10, C: 100, D: 1000}
 
@@ -86,9 +96,10 @@ type room struct {
 type corridor []int
 
 type state struct {
-	cost     int    // total cost of all moves to reach this state
-	rooms    []room // 4 rooms with 2 slots each
-	corridor corridor
+	cost        int    // total cost of all moves to reach this state
+	rooms       []room // 4 rooms with N slots each
+	corridor    corridor
+	breadcrumbs []moveWithCost
 }
 
 // precalculate moving from any corridor to any room
@@ -126,10 +137,9 @@ func precomputePaths() paths {
 	return p
 }
 
-func findMovers() {
-	// return a list of amphipods who can move at all
-	// first ones that can move to their room
-	// then ones in rooms that can move out
+func beginWithDepth(s *state, d int) (cost int) {
+	ROOMDEPTH = d
+	return begin(s)
 }
 
 func begin(s *state) (cost int) {
@@ -147,7 +157,7 @@ func step(s *state) (cost int) {
 	// find moves into a room
 	corridorToRoomMoves := s.findMoversInCorridor()
 	roomToCorridorMoves := s.findMoversInRooms()
-	// FIXME sort the lists of moves by cost
+	// TODO sort the lists of moves by cost, will that help?
 	cost = math.MaxInt
 	for _, m := range corridorToRoomMoves {
 		// make a state for the move, and recurse on it
@@ -157,13 +167,21 @@ func step(s *state) (cost int) {
 		newState.corridor[m.corridor] = -1
 		newState.rooms[m.room].finishers++
 		newState.cost += m.cost
+		newState.breadcrumbs = append(newState.breadcrumbs, m)
 
 		// Store states and cost globally, and if we look at same state but higher cost, don't recurse it; it's already a loser.
 		cachedState, exists := stateCache[newState.toKey()]
-		if exists && cachedState < newState.cost {
+		if exists && cachedState <= newState.cost {
 			// we've been here already for less, so stop looking down this chain
 			//log.Printf("been there done that")
 			break
+		}
+		if LOG && newState.isWinner() {
+			log.Printf("best winner seen yet. cost=%d", newState.cost)
+			for _, bc := range newState.breadcrumbs {
+				log.Println(bc.toString())
+			}
+			log.Println("---")
 		}
 		stateCache[newState.toKey()] = newState.cost
 		//log.Printf("Moving %d from corridor %d to room %d with cost %d", m.who, m.corridor, m.room, m.cost)
@@ -179,29 +197,26 @@ func step(s *state) (cost int) {
 		// take the front starter out of the room
 		newState.rooms[m.room].starters = newState.rooms[m.room].starters[1:]
 		newState.cost += m.cost
+		newState.breadcrumbs = append(newState.breadcrumbs, m)
 
+		// Fuuuuuunky. Trimming room-to-corridor moves with the *same* state and cost causes it to miss some moves.
+		// It's probably my hash keys.
 		// Store states and cost globally, and if we look at same state but higher cost, don't recurse it; it's already a loser.
 		cachedState, exists := stateCache[newState.toKey()]
-		if exists && cachedState < newState.cost {
+		if exists && cachedState < newState.cost { // FIXME why does <= not work?
 			//log.Printf("been there done that")
 			// we've been here already for less, so stop looking down this chain
 			break
 		}
 		stateCache[newState.toKey()] = newState.cost
+
 		//log.Printf("Moving %d from room %d to corridor %d with cost %d", m.who, m.room, m.corridor, m.cost)
 		cost = tools.MinInt(cost, step(newState))
 	}
-
 	return cost
 }
 
-// find all positions they can move to
-// make a state for each one of them
-
-// when a recursive call returns a cost, return min(mycost, itscost)
-
 // returns a list of corridor spots that contain an amphipod that can move
-
 func (s *state) findMoversInCorridor() []moveWithCost {
 	moves := []moveWithCost{}
 	for i, a := range s.corridor {
@@ -232,9 +247,9 @@ func (s *state) findMoversInCorridor() []moveWithCost {
 			continue
 		}
 		cost := path.distance * COSTS[a]
-		if s.rooms[a].finishers == 0 {
-			cost += COSTS[a]
-		}
+
+		// if moving to the back of the room, add some steps
+		cost += COSTS[a] * (ROOMDEPTH - s.rooms[a].finishers - 1)
 		moves = append(moves, moveWithCost{room: a, corridor: i, cost: cost, who: a})
 	}
 	return moves
@@ -246,7 +261,7 @@ func (s *state) findMoversInRooms() []moveWithCost {
 
 	for ir, r := range s.rooms {
 
-		if r.finishers == 2 { // FIXME this will change for step 2; make it a constant
+		if r.finishers == ROOMDEPTH {
 			continue
 		}
 		if len(r.starters) == 0 {
@@ -275,11 +290,9 @@ func (s *state) findMoversInRooms() []moveWithCost {
 				continue
 			}
 			cost := path.distance * COSTS[a]
-			// if moving from the back of the room, add one
-			// FIXME breaking point for size 4 rooms
-			if len(s.rooms[ir].starters)+s.rooms[ir].finishers == 1 {
-				cost += COSTS[a]
-			}
+			// if moving from the back of the room, add some steps
+			depthInRoom := ROOMDEPTH - len(s.rooms[ir].starters) - s.rooms[ir].finishers
+			cost += COSTS[a] * depthInRoom
 			moves = append(moves, moveWithCost{
 				corridor: ic,
 				room:     ir,
@@ -299,7 +312,7 @@ func (r *room) isClear() bool {
 
 func (s *state) isWinner() bool {
 	for _, r := range s.rooms {
-		if r.finishers < 2 { // FIXME update for step 2
+		if r.finishers < ROOMDEPTH {
 			return false
 		}
 	}
@@ -313,6 +326,8 @@ func (s *state) copy() *state {
 	copy(s2.corridor, s.corridor)
 	s2.rooms = make([]room, 4)
 	copy(s2.rooms, s.rooms)
+	s2.breadcrumbs = make([]moveWithCost, len(s.breadcrumbs))
+	copy(s2.breadcrumbs, s.breadcrumbs)
 	return &s2
 }
 
@@ -324,31 +339,36 @@ func (m move) cost(a int) int {
 	return PATHS[m].distance * m.room * COSTS[a]
 }
 
+// if any starters are in final position, change them from starters to finishers
 func (s *state) fixStartingInFinishPosition() {
-	// no input we have has the case where an amphipod is in its room but blocks another, so ignore that case
 
-	for i, r := range s.rooms {
+	for roomNum, r := range s.rooms {
 		updatedStarters := []int{}
-		for _, starter := range r.starters {
-			if starter == i {
+		// if we run into an amphipod that doesn't belong in the room, stop looking
+		// this handles a case where a room contains ABA; the rightmost A is a finished, but the leftmost is not
+		// because it has to move to let the B out
+		stop := false
+		for j := len(r.starters) - 1; j >= 0; j-- {
+			starter := r.starters[j]
+			if starter != roomNum {
+				stop = true
+			}
+			if starter == roomNum && !stop {
 				r.finishers++
 			} else {
+				// this is being built in reverse order and will need to be re-reversed
 				updatedStarters = append(updatedStarters, starter)
 			}
 		}
+		// reverse the order
+		for i, j := 0, len(updatedStarters)-1; i < j; i, j = i+1, j-1 {
+			updatedStarters[i], updatedStarters[j] = updatedStarters[j], updatedStarters[i]
+		}
 		r.starters = updatedStarters
-		s.rooms[i] = r
+		s.rooms[roomNum] = r
 	}
 }
 
-/*
-step- get a state
-make a list of all posssible moves
-create a state for each one
-call(step) on each of those
-if it wins, stop and return cost
-make sure you can't go back and forth forever
-
-
-
-*/
+func (m moveWithCost) toString() string {
+	return fmt.Sprintf("moved %d between corridor %d and room %d with cost %d", m.who, m.corridor, m.room, m.cost)
+}
