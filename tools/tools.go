@@ -68,3 +68,11 @@ func MaxInt(a, b int) int {
 		return b
 	}
 }
+
+func SumSlice(measurements []int) int {
+	sum := 0
+	for _, measurement := range measurements {
+		sum += measurement
+	}
+	return sum
+}
