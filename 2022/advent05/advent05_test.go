@@ -180,6 +180,13 @@ func Test_movingStructsAround(t *testing.T) {
 	assert.Equal(t, []int{1, 2}, a)
 	assert.Len(t, b, 7)
 	assert.Equal(t, []int{6, 7, 8, 9, 3, 4, 5}, b)
+	howmany = 0
+	b = append(b, a[len(a)-howmany:]...)
+	a = a[0 : len(a)-howmany]
+	assert.Len(t, a, 2)
+	assert.Equal(t, []int{1, 2}, a)
+	assert.Len(t, b, 7)
+	assert.Equal(t, []int{6, 7, 8, 9, 3, 4, 5}, b)
 }
 
 func Test_multiMove(t *testing.T) {
@@ -213,4 +220,20 @@ func Test_multiMove(t *testing.T) {
 			}
 		})
 	}
+}
+
+func ExampleMain() {
+	main()
+	// Output:
+	//Magic boxes: QGTHFZBHV
+	//-------------
+	//Magic boxes: MGDMPSZTM
+}
+
+func BenchmarkRun1(b *testing.B) {
+	run1(inputText)
+}
+
+func BenchmarkRun2(b *testing.B) {
+	run2(inputText)
 }
