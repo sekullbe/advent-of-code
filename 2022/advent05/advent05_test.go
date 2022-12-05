@@ -199,6 +199,11 @@ func Test_multiMove(t *testing.T) {
 			args: args{stacks: stacks{0: {}, 1: {'N', 'Z'}, 2: {'D', 'C', 'M'}, 3: {'A'}}, howmany: 2, from: 2, to: 3},
 			want: stacks{0: {}, 1: {'N', 'Z'}, 2: {'D'}, 3: {'A', 'C', 'M'}},
 		},
+		{
+			name: "zeroes",
+			args: args{stacks: stacks{0: {}, 1: {'N', 'Z'}, 2: {'D', 'C', 'M'}, 3: {'A'}}, howmany: 0, from: 0, to: 0},
+			want: stacks{0: {}, 1: {'N', 'Z'}, 2: {'D', 'C', 'M'}, 3: {'A'}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

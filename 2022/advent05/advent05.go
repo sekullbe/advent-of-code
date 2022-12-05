@@ -38,7 +38,10 @@ func run2(inputText string) string {
 
 	for _, line := range parsers.SplitByLines(inputText) {
 		howmany, from, to := parseMove(line)
-		multiMove(stacks, howmany, from, to)
+		// surprisingly this works when parseMove returns 0,0,0, but still handle it to avoid pointless slicing
+		if howmany > 0 {
+			multiMove(stacks, howmany, from, to)
+		}
 	}
 
 	toppers := getTopOfStacks(stacks)
