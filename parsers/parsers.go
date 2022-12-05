@@ -43,3 +43,7 @@ func SplitByEmptyNewline(str string) []string {
 func SplitByLines(str string) []string {
 	return strings.Split(strings.TrimSpace(str), "\n")
 }
+
+func SplitByLinesNoTrim(str string) []string {
+	return strings.Split(str, "\n")
+}
