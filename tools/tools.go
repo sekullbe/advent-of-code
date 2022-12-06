@@ -1,10 +1,16 @@
 package tools
 
 import (
+	"golang.org/x/exp/constraints"
 	"log"
 	"math"
+	"sort"
 	"strconv"
 )
+
+type AnyInt interface {
+	constraints.Signed | constraints.Unsigned
+}
 
 // yes I know 'util' etc is bad practice as a package
 // so maybe I'll refactor this as I split things up
@@ -69,10 +75,70 @@ func MaxInt(a, b int) int {
 	}
 }
 
-func SumSlice(measurements []int) int {
-	sum := 0
+// Generic tools, from https://bitfieldconsulting.com/golang/functional
+
+// Contains returns true if the slice contains the value
+func Contains[E comparable](s []E, v E) bool {
+	for _, vs := range s {
+		if v == vs {
+			return true
+		}
+	}
+	return false
+}
+
+// Reverse a slice's order
+func Reverse[E any](s []E) []E {
+	result := make([]E, 0, len(s))
+	for i := len(s) - 1; i >= 0; i-- {
+		result = append(result, s[i])
+	}
+	return result
+}
+
+// Sort a slice
+func Sort[E constraints.Ordered](s []E) []E {
+	result := make([]E, len(s))
+	copy(result, s)
+	sort.Slice(result, func(i, j int) bool {
+		return result[i] < result[j]
+	})
+	return result
+}
+
+// SumSlice sums any kind of integer value
+func SumSlice[T AnyInt](measurements []T) T {
+	var sum T
 	for _, measurement := range measurements {
 		sum += measurement
 	}
 	return sum
+}
+
+// KeepFunc is used in filtering
+type KeepFunc[E any] func(E) bool
+
+// Filter the slice to all values where the KeepFunc is true
+func Filter[E any](s []E, f KeepFunc[E]) []E {
+	result := []E{}
+	for _, v := range s {
+		if f(v) {
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
+func IsEven[T AnyInt](v T) bool {
+	return v%2 == 0
+}
+
+type reduceFunc[E any] func(E, E) E
+
+func Reduce[E any](s []E, init E, f reduceFunc[E]) E {
+	cur := init
+	for _, v := range s {
+		cur = f(cur, v)
+	}
+	return cur
 }
