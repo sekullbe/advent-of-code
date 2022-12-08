@@ -1,5 +1,7 @@
 package main
 
+import "log"
+
 type point struct {
 	x int
 	y int
@@ -9,6 +11,8 @@ type tree struct {
 	height                 int
 	visN, visE, visW, visS bool // visible from each direction
 	visible                bool
+	sW, sE, sN, sS         int //scenic scores for each direction
+	scenicScore            int
 }
 
 type forest map[point]tree
@@ -73,7 +77,7 @@ func (w *world) display() string {
 	return out
 }
 
-func (w *world) computeVisibility() {
+func (w *world) computeVisibility() int {
 	for x := 0; x <= w.maxX; x++ {
 		w.computeVisibilityFromNorthForCol(x)
 		w.computeVisibilityFromSouthForCol(x)
@@ -82,11 +86,53 @@ func (w *world) computeVisibility() {
 		w.computeVisibilityFromEastForRow(y)
 		w.computeVisibilityFromWestForRow(y)
 	}
+	maxScenicScore := 0
+	for p, t := range w.forest {
+		scenicScore := t.sE * t.sN * t.sW * t.sS
+		if scenicScore > maxScenicScore {
+			maxScenicScore = scenicScore
+			log.Printf("Tree at %d,%d has score E%d*W%d*N%d*S%d= %d\n", p.x, p.y, t.sE, t.sW, t.sN, t.sS, scenicScore)
+		}
+	}
+	return maxScenicScore
+}
+
+// keep a map of the last coordinate a tree of a given height was seen
+// then for this tree, it is height H; look in the map for any height H->9
+// subtract our X from that X, that's the distance
+
+type lastSeenTreeOfEachHeight map[int]int
+
+// Finds the last seen stored tree of supplied height or taller
+func (lst lastSeenTreeOfEachHeight) findNearestTallTreeFromNorthOrWest(height int) int {
+	lastSeenTallTreeLoc := 0
+	for ht := height; ht <= 9; ht++ {
+		l := lst[ht]
+		if l >= lastSeenTallTreeLoc {
+			lastSeenTallTreeLoc = l
+		}
+	}
+	return lastSeenTallTreeLoc
+}
+
+func (lst lastSeenTreeOfEachHeight) findNearestTallTreeFromSouthOrEast(height int, max int) int {
+	lastSeenTallTreeLoc := max
+	for ht := height; ht <= 9; ht++ {
+		l := lst[ht]
+		if l == 0 {
+			l = max
+		}
+		if l <= lastSeenTallTreeLoc {
+			lastSeenTallTreeLoc = l
+		}
+	}
+	return lastSeenTallTreeLoc
 }
 
 func (w *world) computeVisibilityFromWestForRow(y int) {
 	// we already know about x == 0
 	tallestSoFar := w.forest.getTreeAt(point{0, y}).height
+	lst := make(lastSeenTreeOfEachHeight)
 	for x := 1; x < w.maxX; x++ {
 		p := point{x, y}
 		t := w.forest.getTreeAt(p)
@@ -97,12 +143,16 @@ func (w *world) computeVisibilityFromWestForRow(y int) {
 		} else {
 			t.visW = false
 		}
+		t.sW = x - lst.findNearestTallTreeFromNorthOrWest(t.height)
+		lst[t.height] = x
 		w.forest[p] = t
 	}
 }
+
 func (w *world) computeVisibilityFromEastForRow(y int) {
 	// we already know about x == 0
 	tallestSoFar := w.forest.getTreeAt(point{w.maxX, y}).height
+	lst := make(lastSeenTreeOfEachHeight)
 	for x := w.maxX - 1; x >= 1; x-- {
 		p := point{x, y}
 		t := w.forest.getTreeAt(p)
@@ -113,6 +163,12 @@ func (w *world) computeVisibilityFromEastForRow(y int) {
 		} else {
 			t.visE = false
 		}
+		ntt := lst.findNearestTallTreeFromSouthOrEast(t.height, w.maxX)
+		if ntt == 0 {
+			ntt = w.maxX
+		}
+		t.sE = ntt - x
+		lst[t.height] = x
 		w.forest[p] = t
 	}
 }
@@ -120,6 +176,7 @@ func (w *world) computeVisibilityFromEastForRow(y int) {
 func (w *world) computeVisibilityFromNorthForCol(x int) {
 	// we already know about y == 0
 	tallestSoFar := w.forest.getTreeAt(point{x, 0}).height
+	lst := make(lastSeenTreeOfEachHeight)
 	for y := 1; y < w.maxY; y++ {
 		p := point{x, y}
 		t := w.forest.getTreeAt(p)
@@ -130,12 +187,15 @@ func (w *world) computeVisibilityFromNorthForCol(x int) {
 		} else {
 			t.visN = false
 		}
+		t.sN = y - lst.findNearestTallTreeFromNorthOrWest(t.height)
+		lst[t.height] = y
 		w.forest[p] = t
 	}
 }
 func (w *world) computeVisibilityFromSouthForCol(x int) {
 	// we already know about y == 0
 	tallestSoFar := w.forest.getTreeAt(point{x, w.maxY}).height
+	lst := make(lastSeenTreeOfEachHeight)
 	for y := w.maxY - 1; y >= 1; y-- {
 		p := point{x, y}
 		t := w.forest.getTreeAt(p)
@@ -146,6 +206,12 @@ func (w *world) computeVisibilityFromSouthForCol(x int) {
 		} else {
 			t.visS = false
 		}
+		ntt := lst.findNearestTallTreeFromSouthOrEast(t.height, w.maxY)
+		if ntt == 0 {
+			ntt = w.maxY
+		}
+		t.sS = ntt - y
+		lst[t.height] = y
 		w.forest[p] = t
 	}
 }

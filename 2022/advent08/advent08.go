@@ -11,12 +11,10 @@ var inputText string
 
 func main() {
 	lines := parsers.SplitByLines(inputText)
-	fmt.Printf("Magic number: %d\n", run1(lines))
-	fmt.Println("-------------")
-	fmt.Printf("Magic number: %d\n", run2(lines))
+	run(lines)
 }
 
-func run1(lines []string) int {
+func run(lines []string) (int, int) {
 
 	maxX := len(lines[0]) - 1
 	maxY := len(lines) - 1
@@ -26,14 +24,23 @@ func run1(lines []string) int {
 			w.addTree(x, y, int(treeHeightRune-'0'))
 		}
 	}
-	w.computeVisibility()
+
 	//fmt.Println(w.display())
+	maxScenicScore := w.computeVisibility()
 	visibleTrees := w.forest.countVisibleTrees()
 
-	return visibleTrees
+	fmt.Printf("Part 1 Magic number: %d\n", visibleTrees)
+	fmt.Println("-------------")
+	fmt.Printf("Part 2 Magic number: %d\n", maxScenicScore)
+	return visibleTrees, maxScenicScore
+}
+
+func run1(lines []string) int {
+	vt, _ := run(lines)
+	return vt
 }
 
 func run2(lines []string) int {
-
-	return 0
+	_, mss := run(lines)
+	return mss
 }
