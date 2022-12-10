@@ -45,9 +45,12 @@ func (p *processor) tick(nextInstr string) (consumedInstruction bool, xregDuring
 
 	p.clock += 1
 	xregDuring = p.xreg
-	if p.operationTime > 0 {
+	if p.operationTime > 1 {
 		p.operationTime--
+		consumedInstruction = false
+	} else if p.operationTime == 1 {
 		p.executeOp(p.scheduledOp, p.scheduledArg)
+		p.operationTime--
 		consumedInstruction = true
 	} else {
 		// read an op and either do it or schedule it
