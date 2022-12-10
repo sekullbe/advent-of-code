@@ -97,8 +97,6 @@ func run1(lines []string) int {
 			instrPtr++
 		}
 		if (proc.clock-20)%40 == 0 {
-			// this is the value AFTER that cycle so if an op finishes in that cycle it will be wrong value
-			// the value BEFORE the cycle starts is going to be the same as DURING the cycle, right?
 			signalStrength := proc.clock * xregDuring
 			sumStrengths += signalStrength
 			log.Printf("Cycle %d: Signal strength %d, sum %d", proc.clock, signalStrength, sumStrengths)
