@@ -17,8 +17,15 @@ func main() {
 }
 
 func run1(inputText string) int {
-	lines := parsers.SplitByLines(inputText)
-	b := newBoard()
+	return doit(parsers.SplitByLines(inputText), 2)
+}
+
+func run2(inputText string) int {
+	return doit(parsers.SplitByLines(inputText), 10)
+}
+
+func doit(lines []string, ropeLength int) int {
+	b := newBoard(ropeLength)
 
 	for _, line := range lines {
 		var dir rune
@@ -33,9 +40,4 @@ func run1(inputText string) int {
 	}
 	// now count up how many spots in the grid are true
 	return len(b.tailVisited)
-}
-
-func run2(inputText string) int {
-
-	return 0
 }

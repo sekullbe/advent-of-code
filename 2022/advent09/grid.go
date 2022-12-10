@@ -11,31 +11,44 @@ type point struct {
 }
 
 type board struct {
-	h, t        point
+	rope        []point // 0 is the head
+	ropeLength  int
 	tailVisited map[point]any
 }
 
 var exists = struct{}{}
 
-func newBoard() board {
+func newBoard(ropeLength int) board {
 	tv := make(map[point]any)
 	tv[point{0, 0}] = exists
-	return board{h: point{0, 0}, t: point{0, 0}, tailVisited: tv}
+	rope := make([]point, ropeLength)
+	for i := 0; i < ropeLength; i++ {
+		rope[i] = point{0, 0}
+	}
+	return board{tailVisited: tv, rope: rope, ropeLength: ropeLength}
 }
 
 // Moves head per the direction, and tail to catch up
 func (b *board) move(dir rune) {
-	b.h = b.h.getNewMovePoint(dir)
-	// if touching or adjacent do nothing
-	if adjacent(b.h, b.t) {
-		return
+	// First move the head
+	b.rope[0] = b.rope[0].getNewMovePoint(dir)
+
+	// Then move each knot (rope[1]-rope[ropeLength]) in turn
+	// set tailVisited when last knot moves
+	for i := 1; i < b.ropeLength; i++ {
+		// if touching or adjacent do nothing
+		if adjacent(b.rope[i-1], b.rope[i]) {
+			return
+		}
+		if isStraightLine(b.rope[i-1], b.rope[i]) {
+			b.rope[i] = moveOneCloserRookwise(b.rope[i-1], b.rope[i])
+		} else {
+			b.rope[i] = moveOneCloserBishopwise(b.rope[i-1], b.rope[i])
+		}
+		if i == b.ropeLength-1 {
+			b.tailVisited[b.rope[i]] = exists
+		}
 	}
-	if isStraightLine(b.h, b.t) {
-		b.t = moveOneCloserRookwise(b.h, b.t)
-	} else {
-		b.t = moveOneCloserBishopwise(b.h, b.t)
-	}
-	b.tailVisited[b.t] = exists
 }
 
 // Unlike previous implementations, positive Y is UP not DOWN
