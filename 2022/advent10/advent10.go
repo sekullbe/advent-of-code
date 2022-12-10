@@ -60,6 +60,8 @@ func (p *processor) tick(nextInstr string) (consumedInstruction bool, xregDuring
 			log.Panicf("Unimplemented op: %s", nextInstr)
 		}
 		if optime > 0 {
+			// Given that I don't move the instruction pointer until the slow op completes, I could just read it again.
+			// But it's already parsed, so might as well just store it.
 			p.scheduledOp = op
 			p.scheduledArg = arg
 			p.operationTime = optime
@@ -108,6 +110,24 @@ func run1(lines []string) int {
 }
 
 func run2(lines []string) int {
+	instrPtr := 1
+	proc := newProcessor()
+	for instrPtr <= len(lines) {
+		line := lines[instrPtr-1]
+		completedOp, xregDuring := proc.tick(line)
+		if completedOp {
+			instrPtr++
+		}
+		spritePos := (proc.clock - 1) % 40
+		pixel := ".."
+		if xregDuring == spritePos || xregDuring-1 == spritePos || xregDuring+1 == spritePos {
+			pixel = "##"
+		}
+		fmt.Printf("%s", pixel)
+		if proc.clock%40 == 0 {
+			fmt.Println()
+		}
+	}
 
 	return 0
 }
