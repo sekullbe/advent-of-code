@@ -30,7 +30,18 @@ type monkey struct {
 	inspectCount int
 }
 
-type barrel map[int]monkey
+// type barrel map[int]monkey
+type barrel struct {
+	lcd     int
+	monkeys map[int]monkey
+}
+
+func newBarrel() barrel {
+	return barrel{
+		lcd:     1,
+		monkeys: make(map[int]monkey),
+	}
+}
 
 func eMonkey() monkey {
 	return monkey{
@@ -40,22 +51,21 @@ func eMonkey() monkey {
 }
 
 func parseMonkeys(lines []string) barrel {
-
-	b := make(barrel)
+	b := newBarrel()
 	var monkeyLineGroup []string
 	for _, line := range lines {
 		if line != "" {
 			monkeyLineGroup = append(monkeyLineGroup, line)
 		} else {
 			m := parseOneMonkey(monkeyLineGroup)
-			b[m.id] = m
+			b.monkeys[m.id] = m
 			monkeyLineGroup = monkeyLineGroup[:0]
 		}
 	}
 	// get the last one
 	if len(monkeyLineGroup) == 6 {
 		m := parseOneMonkey(monkeyLineGroup)
-		b[m.id] = m
+		b.monkeys[m.id] = m
 	}
 	return b
 }
@@ -78,7 +88,7 @@ func parseOneMonkey(lines []string) monkey {
 
 func (b *barrel) monkeyTurn(monkeyNum int, worryReductionFactor int) {
 	// inspect each item
-	m := (*b)[monkeyNum]
+	m := (*b).monkeys[monkeyNum]
 	items := m.items
 	for _, item := range items {
 		m.inspectCount++
@@ -100,7 +110,11 @@ func (b *barrel) monkeyTurn(monkeyNum int, worryReductionFactor int) {
 		// reduce worry
 		item = item / worryReductionFactor // this rounds towards zero; if worry doesn't go negative we're ok
 		// throw item to *end* of target's list (append not shift)
-		if item%m.testNum == 0 {
+		pass := item%m.testNum == 0
+		if b.lcd > 1 {
+			item %= b.lcd
+		}
+		if pass {
 			b.throwToMonkey(m.targetTrue, item)
 		} else {
 			b.throwToMonkey(m.targetFalse, item)
@@ -108,13 +122,13 @@ func (b *barrel) monkeyTurn(monkeyNum int, worryReductionFactor int) {
 	}
 
 	m.items = m.items[:0]
-	(*b)[m.id] = m
+	(*b).monkeys[m.id] = m
 }
 
 func (b *barrel) throwToMonkey(monkeyId int, item int) {
-	target := (*b)[monkeyId]
+	target := (*b).monkeys[monkeyId]
 	target.items = append(target.items, item)
-	(*b)[monkeyId] = target
+	(*b).monkeys[monkeyId] = target
 }
 
 func run1(inputText string) int {
@@ -122,12 +136,12 @@ func run1(inputText string) int {
 	b := parseMonkeys(parsers.SplitByLinesNoTrim(inputText))
 	rounds := 20
 	for i := 0; i < rounds; i++ {
-		for mId := 0; mId < len(b); mId++ {
+		for mId := 0; mId < len(b.monkeys); mId++ {
 			b.monkeyTurn(mId, 3)
 		}
 	}
 	var inspectCounts []int
-	for _, m := range b {
+	for _, m := range b.monkeys {
 		log.Printf("Monkey %d inspected items %d times\n", m.id, m.inspectCount)
 		inspectCounts = append(inspectCounts, m.inspectCount)
 	}
@@ -138,9 +152,12 @@ func run1(inputText string) int {
 
 func run2(inputText string) int {
 	b := parseMonkeys(parsers.SplitByLinesNoTrim(inputText))
+	for _, m := range b.monkeys {
+		b.lcd *= m.testNum
+	}
 	rounds := 10000
 	for round := 1; round <= rounds; round++ {
-		for mId := 0; mId < len(b); mId++ {
+		for mId := 0; mId < len(b.monkeys); mId++ {
 			b.monkeyTurn(mId, 1)
 		}
 
@@ -150,7 +167,7 @@ func run2(inputText string) int {
 		//}
 	}
 	var inspectCounts []int
-	for _, m := range b {
+	for _, m := range b.monkeys {
 		inspectCounts = append(inspectCounts, m.inspectCount)
 	}
 	// get top 2 and multiply them
@@ -159,7 +176,7 @@ func run2(inputText string) int {
 }
 
 func (b barrel) reportInspections() {
-	for _, m := range b {
+	for _, m := range b.monkeys {
 		log.Printf("Monkey %d inspected items %d times\n", m.id, m.inspectCount)
 	}
 }

@@ -56,39 +56,41 @@ func Test_parseMonkeys(t *testing.T) {
 		want barrel
 	}{
 		{name: "sample", args: args{parsers.SplitByLinesNoTrim(testInput)}, want: barrel{
-			0: monkey{
-				id:          0,
-				items:       []int{79, 98},
-				op:          '*',
-				opArg:       "19",
-				testNum:     23,
-				targetTrue:  2,
-				targetFalse: 3},
-			1: monkey{
-				id:          1,
-				items:       []int{54, 65, 75, 74},
-				op:          '+',
-				opArg:       "6",
-				testNum:     19,
-				targetTrue:  2,
-				targetFalse: 0},
-			2: monkey{
-				id:          2,
-				items:       []int{79, 60, 97},
-				op:          '*',
-				opArg:       "old",
-				testNum:     13,
-				targetTrue:  1,
-				targetFalse: 3},
-			3: monkey{
-				id:          3,
-				items:       []int{74},
-				op:          '+',
-				opArg:       "3",
-				testNum:     17,
-				targetTrue:  0,
-				targetFalse: 1},
-		}},
+			lcd: 1,
+			monkeys: map[int]monkey{
+				0: monkey{
+					id:          0,
+					items:       []int{79, 98},
+					op:          '*',
+					opArg:       "19",
+					testNum:     23,
+					targetTrue:  2,
+					targetFalse: 3},
+				1: monkey{
+					id:          1,
+					items:       []int{54, 65, 75, 74},
+					op:          '+',
+					opArg:       "6",
+					testNum:     19,
+					targetTrue:  2,
+					targetFalse: 0},
+				2: monkey{
+					id:          2,
+					items:       []int{79, 60, 97},
+					op:          '*',
+					opArg:       "old",
+					testNum:     13,
+					targetTrue:  1,
+					targetFalse: 3},
+				3: monkey{
+					id:          3,
+					items:       []int{74},
+					op:          '+',
+					opArg:       "3",
+					testNum:     17,
+					targetTrue:  0,
+					targetFalse: 1},
+			}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
