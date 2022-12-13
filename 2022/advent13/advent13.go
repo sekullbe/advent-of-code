@@ -4,9 +4,11 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"github.com/samber/lo"
 	"github.com/sekullbe/advent/parsers"
 	"log"
 	"reflect"
+	"sort"
 )
 
 //go:embed input.txt
@@ -17,8 +19,6 @@ func main() {
 	fmt.Println("-------------")
 	fmt.Printf("Magic number: %d\n", run2(inputText))
 }
-
-// make sure to handle empty packets
 
 func run1(inputText string) int {
 	packetPairs := parsers.SplitByEmptyNewline(inputText)
@@ -52,7 +52,7 @@ func leftIsLess(left []any, right []any) bool {
 
 // remember we short-circuit out of this as soon as we get any non-equal lineup
 // inputs can be either float64 or any nesting of lists of float64
-// whoops, tried this pure boolean but no go, because it needs to allow an 'equal' when recursing. so use -1 < 0 = 1 >
+// whoops, tried this pure boolean but no go, because it needs to allow an 'equal' when recursing. so use -1 <, 0 =, 1 >
 func compareLeftRight(left []any, right []any) int {
 	for i := 0; i < len(left) && i < len(right); i++ {
 		l := left[i]
@@ -78,7 +78,7 @@ func compareLeftRight(left []any, right []any) int {
 			var rSubPacket []any
 			// if they're not both lists, make the one that isn't into a list (slice)
 			if lnum {
-				lSubPacket = []any{l} // wrap it in listiness
+				lSubPacket = []any{l} // wrap it in listiness... listitude?
 			} else {
 				lSubPacket = l.([]any) // it's a 'any' but we know it's a []any so force it
 			}
@@ -108,6 +108,19 @@ func compareLeftRight(left []any, right []any) int {
 }
 
 func run2(inputText string) int {
+	// split the lines while discarding newlines
+	lines := lo.Filter(parsers.SplitByLines(inputText), func(line string, index int) bool { return line != "" })
+	packets := parsePackets(lines)
+	p26 := parsePackets([]string{"[[2]]", "[[6]]"})
+	packets = append(packets, p26...)
+	sort.Slice(packets, func(i, j int) bool { return leftIsLess(packets[i], packets[j]) })
+	// now find the special packets...
+	key := 1
+	for i, packet := range packets {
+		if compareLeftRight(packet, p26[0]) == 0 || compareLeftRight(packet, p26[1]) == 0 {
+			key *= i + 1
+		}
+	}
 
-	return 0
+	return key
 }
