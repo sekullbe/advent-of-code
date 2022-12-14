@@ -26,6 +26,15 @@ func run1(inputText string) int {
 }
 
 func run2(inputText string) int {
-
-	return 0
+	dropPoint := point{500, 0}
+	w := parseRockVeins(parsers.SplitByLines(inputText))
+	w.lowestRock = w.lowestRock + 2
+	// The width here should be just enough for a pyramid to form based around the drop point
+	for x := dropPoint.x - w.lowestRock; x <= dropPoint.x+w.lowestRock; x++ {
+		w.grid[point{x, w.lowestRock}] = '#'
+	}
+	for w.dropSand(dropPoint) {
+	}
+	//w.printWorld()
+	return w.sandCount // 1005 too low
 }

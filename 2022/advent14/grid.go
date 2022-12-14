@@ -118,8 +118,13 @@ func (w *world) dropSand(dropPoint point) bool {
 		return false
 	}
 
+	_, filled := w.grid[dropPoint]
+	if filled { // Drop point is blocked!
+		return false
+	}
+
 	// look down, if we can go down, call that
-	_, filled := w.grid[dropPoint.downPoint()]
+	_, filled = w.grid[dropPoint.downPoint()]
 	if !filled {
 		return w.dropSand(dropPoint.downPoint())
 	} // look left, if that's clear, call that
