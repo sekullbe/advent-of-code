@@ -23,7 +23,7 @@ type world struct {
 	sandCount                       int
 }
 
-// a little gratuitious but lets me change the implementation if I need to later
+// a little gratuitous but lets me change the implementation if I need to later, which I did end up doing...
 func newWorld() world {
 	return world{
 		grid:       make(map[point]rune),
