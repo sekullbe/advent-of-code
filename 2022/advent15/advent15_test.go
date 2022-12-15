@@ -18,7 +18,7 @@ Sensor at x=14, y=3: closest beacon is at x=15, y=3
 Sensor at x=20, y=1: closest beacon is at x=15, y=3
 `
 
-func Test_run1(t *testing.T) {
+func Test_run1_countingOnly(t *testing.T) {
 	type args struct {
 		inputText string
 		yToCheck  int
@@ -32,7 +32,28 @@ func Test_run1(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := run1(tt.args.inputText, tt.args.yToCheck); got != tt.want {
+			if got := run1_countingOnly(tt.args.inputText, tt.args.yToCheck); got != tt.want {
+				t.Errorf("run1() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_run1_withGrid(t *testing.T) {
+	type args struct {
+		inputText string
+		yToCheck  int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "example", args: args{inputText: testinput, yToCheck: 10}, want: 26},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run1_withGrid(tt.args.inputText, tt.args.yToCheck); got != tt.want {
 				t.Errorf("run1() = %v, want %v", got, tt.want)
 			}
 		})
