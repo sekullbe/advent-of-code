@@ -15,9 +15,10 @@ var inputText string
 
 func main() {
 	fmt.Printf("Magic number: %d\n", run1_countingOnly(inputText, 2000000))
-	fmt.Printf("Magic number: %d\n", run1_withGrid(inputText, 2000000))
+	// this is too slow to keep running, like 5s or so
+	//fmt.Printf("Magic number: %d\n", run1_withGrid(inputText, 2000000))
 	fmt.Println("-------------")
-	fmt.Printf("Magic number: %d\n", run2(inputText))
+	fmt.Printf("Magic number: %d\n", run2(inputText, 4_000_000))
 }
 
 type sensor struct {
@@ -144,9 +145,9 @@ func run1_countingOnly(inputText string, yToCheck int) (noBeaconCount int) {
 	for x := w.minX; x < w.maxX; x++ {
 		// for each sensor, see if this loc is in its no-beacon distance
 		// but also that it's not actually a beacon
+		p := image.Point{x, yToCheck}
 		foundone := false
 		for _, s := range w.sensors {
-			p := image.Point{x, yToCheck}
 			d := rectangularDistance(p, s.location)
 			if p != s.nearest && d <= s.distance {
 				noBeaconCount++
@@ -162,7 +163,28 @@ func run1_countingOnly(inputText string, yToCheck int) (noBeaconCount int) {
 	return noBeaconCount
 }
 
-func run2(inputText string) int {
+func run2(inputText string, maxXY int) int {
+	w := newWorld()
+	w.parseSensors(parsers.SplitByLines(inputText))
+	for y := 0; y <= maxXY; y++ {
+	scanx:
+		for x := 0; x <= maxXY; x++ {
+			p := image.Point{X: x, Y: y}
+			for _, s := range w.sensors {
+				d := rectangularDistance(p, s.location)
+				// we want a point that's not within d of a sensor and is not a beacon already
+				if d <= s.distance {
+					// if p is within range of a sensor, it must not be a beacon, or else it would have been detected
+					// skip over this sensor's range because otherwise we waste cycles
+					// dist is dx+dy; we need to know how much X to skip so subtract the y component of distance
+					skipKnownSpace := s.distance - tools.AbsInt(s.location.Y-p.Y) + s.location.X - p.X
+					x += skipKnownSpace
+					continue scanx
+				}
+			}
+			return p.X*4_000_000 + p.Y
+		}
+	}
 
 	return 0
 }

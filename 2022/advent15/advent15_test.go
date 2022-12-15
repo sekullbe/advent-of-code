@@ -59,3 +59,24 @@ func Test_run1_withGrid(t *testing.T) {
 		})
 	}
 }
+
+func Test_run2(t *testing.T) {
+	type args struct {
+		inputText string
+		maxXY     int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "example", args: args{inputText: testinput, maxXY: 20}, want: 56_000_011},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run2(tt.args.inputText, tt.args.maxXY); got != tt.want {
+				t.Errorf("run2() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
