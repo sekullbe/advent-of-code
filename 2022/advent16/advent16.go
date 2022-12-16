@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	combos "github.com/mxschmitt/golang-combinations"
 	"github.com/samber/lo"
 	"github.com/sekullbe/advent/parsers"
 	"github.com/sekullbe/advent/tools"
@@ -33,12 +34,9 @@ type volcano struct {
 
 func newVolcano() volcano {
 	return volcano{
-		time:                  1,
-		openValveRate:         0,
-		totalPressureRelieved: 0,
-		valves:                []*valve{},
-		valveMap:              make(map[string]*valve),
-		valveIdMap:            make(map[int]*valve),
+		valves:     []*valve{},
+		valveMap:   make(map[string]*valve),
+		valveIdMap: make(map[int]*valve),
 	}
 }
 
@@ -104,7 +102,7 @@ func parseAllValves(valveLines []string) volcano {
 	g := graph.New(len(vol.valves))
 	for id, vp := range vol.valveIdMap {
 		for _, toP := range vp.leadsTo {
-			g.AddBothCost(id, toP.id, 1)
+			g.AddBothCost(id, toP.id, 1) // there might be a way to use the flows in this graph
 		}
 	}
 	// ... and compute cost S->T for all S,T | S!=T
@@ -113,14 +111,6 @@ func parseAllValves(valveLines []string) volcano {
 		for i := 0; i < len(dists); i++ {
 			start.reachability[vol.valveIdMap[i]] = int(dists[i])
 		}
-		/*
-			for _, target := range vol.valves {
-				_, d := graph.ShortestPath(g, start.id, target.id)
-				start.reachability[target] = int(d)
-				//ps := lo.Map(p, func(id int, index int) string { return vol.valveIdMap[id].name }) //ids to names
-				//log.Printf("path from %s to %s: %s\n", start.name, target.name, ps)
-			}
-		*/
 	}
 
 	return vol
@@ -171,7 +161,32 @@ func run1(inputText string) int {
 func run2(inputText string) int {
 	const timeLimit int = 26
 	vol := parseAllValves(parsers.SplitByLines(inputText))
-	_ = vol
+	maxTotalPressure := 0
 
-	return 0
+	allTargets := lo.Filter(vol.valves, func(v *valve, idx int) bool { return v.flowRate > 0 })
+	// give me and Elsie the Elephant half of the possible endpoints... no that doesn't work
+	//myTargets := allTargets[0 : len(allTargets)/2]
+	//elsieTargets := allTargets[len(allTargets)/2+1:]
+
+	// examine every possible split of the targets
+	// starting with I get 1, Elsie gets N-1
+	// up to I get N-1, Elsie gets 1
+	// actually half will do, because at that point it's just mirroring
+
+	// You can play some risky games by changing the start value of i here, on the assumption that the correct
+	// split is *probably* closer to 50/50; that doesn't work with the example because it's too small, but
+	// becomes feasible as the target list grows. I shaved 1/3 of the time starting at len/3 here.
+	for i := 1; i < len(allTargets)/2; i++ {
+		combos := combos.Combinations(allTargets, i)
+		for _, mytargets := range combos {
+			elsieTargets := tools.SliceSubtract(allTargets, mytargets)
+			myPressure := vol.findMaxPressure(0, 0, 0, vol.valveMap["AA"], mytargets, timeLimit)
+			elsiePressure := vol.findMaxPressure(0, 0, 0, vol.valveMap["AA"], elsieTargets, timeLimit)
+			if myPressure+elsiePressure > maxTotalPressure {
+				maxTotalPressure = myPressure + elsiePressure
+			}
+		}
+	}
+
+	return maxTotalPressure
 }

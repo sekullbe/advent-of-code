@@ -152,3 +152,18 @@ func RemoveFromSlice[T comparable](theslice []T, doomed T) []T {
 	}
 	return newslice
 }
+
+// SliceSubtract returns a-b ; all elements in a that are not in b
+func SliceSubtract[T comparable](a, b []T) []T {
+	mb := make(map[T]struct{}, len(b))
+	for _, x := range b {
+		mb[x] = struct{}{}
+	}
+	var diff []T
+	for _, x := range a {
+		if _, found := mb[x]; !found {
+			diff = append(diff, x)
+		}
+	}
+	return diff
+}
