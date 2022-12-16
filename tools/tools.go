@@ -142,3 +142,13 @@ func Reduce[E any](s []E, init E, f reduceFunc[E]) E {
 	}
 	return cur
 }
+
+func RemoveFromSlice[T comparable](theslice []T, doomed T) []T {
+	newslice := []T{}
+	for _, t := range theslice {
+		if t != doomed {
+			newslice = append(newslice, t)
+		}
+	}
+	return newslice
+}
