@@ -51,8 +51,7 @@ func TestSliceSubtract(t *testing.T) {
 	tests := []testCase[string]{
 		{name: "simple", args: args[string]{a: []string{"A", "B", "C", "D"}, b: []string{"B", "D"}}, want: []string{"A", "C"}},
 		{name: "zero", args: args[string]{a: []string{"A", "B", "C", "D"}, b: []string{}}, want: []string{"A", "B", "C", "D"}},
-		// this correctly returns an empty slice, but the test does not pass
-		//{name: "all", args: args[string]{a: []string{"A", "B", "C", "D"}, b: []string{"A", "B", "C", "D"}}, want: []string{}},
+		{name: "all", args: args[string]{a: []string{"A", "B", "C", "D"}, b: []string{"A", "B", "C", "D"}}, want: []string{}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

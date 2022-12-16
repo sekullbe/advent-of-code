@@ -159,7 +159,7 @@ func SliceSubtract[T comparable](a, b []T) []T {
 	for _, x := range b {
 		mb[x] = struct{}{}
 	}
-	var diff []T
+	diff := []T{}
 	for _, x := range a {
 		if _, found := mb[x]; !found {
 			diff = append(diff, x)
