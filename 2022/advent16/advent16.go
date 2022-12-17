@@ -16,7 +16,7 @@ import (
 var inputText string
 
 func main() {
-	fmt.Printf("Magic number: %d\n", run1(inputText))
+	fmt.Printf("Magic number: %d\n", run1(inputText, 30))
 	fmt.Println("-------------")
 	fmt.Printf("Magic number: %d\n", run2(inputText))
 }
@@ -147,8 +147,7 @@ func (vol *volcano) findMaxPressure(tick int, pressure int, flow int, currentVal
 	return bestScoreYet
 }
 
-func run1(inputText string) int {
-	const timeLimit int = 30
+func run1(inputText string, timeLimit int) int {
 
 	vol := parseAllValves(parsers.SplitByLines(inputText))
 	// you never want to end up in a valve that does nothing, so don't bother with them as endpoints

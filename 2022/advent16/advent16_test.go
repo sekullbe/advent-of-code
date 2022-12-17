@@ -45,18 +45,25 @@ func Test_parseValve(t *testing.T) {
 func Test_run1(t *testing.T) {
 	type args struct {
 		inputText string
+		timeLimit int
 	}
 	tests := []struct {
 		name string
 		args args
 		want int
 	}{
-		{name: "example", args: args{testinput}, want: 1651},
-		{name: "real", args: args{inputText: inputText}, want: 2330},
+		{name: "1min", args: args{testinput, 1}, want: 0},
+		{name: "2min", args: args{testinput, 2}, want: 0},
+		{name: "3min", args: args{testinput, 3}, want: 20},
+		{name: "4min", args: args{testinput, 4}, want: 40},
+		{name: "5min", args: args{testinput, 5}, want: 63},
+		{name: "10min", args: args{testinput, 10}, want: 246},
+		{name: "example", args: args{testinput, 30}, want: 1651},
+		{name: "real", args: args{inputText: inputText, timeLimit: 30}, want: 2330},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := run1(tt.args.inputText); got != tt.want {
+			if got := run1(tt.args.inputText, tt.args.timeLimit); got != tt.want {
 				t.Errorf("run1() = %v, want %v", got, tt.want)
 			}
 		})
