@@ -13,9 +13,9 @@ import (
 var inputText string
 
 func main() {
-	fmt.Printf("Magic number: %d\n", run1(inputText))
+	fmt.Printf("Magic number: %d\n", run1(inputText, 2022))
 	fmt.Println("-------------")
-	fmt.Printf("Magic number: %d\n", run2(inputText))
+	fmt.Printf("Magic number: %d\n", run1(inputText, 1_000_000_000_000))
 }
 
 const (
@@ -32,7 +32,20 @@ const CAVERN_MAX_X = 6
 type board struct {
 	cave      map[image.Point]any
 	maxheight int
+	minheight int
 	nextRock  int
+}
+
+// stateKey valid AFTER a tick has completed
+type stateKey struct {
+	peaks   [7]int
+	windIdx int
+	rockIdx int
+}
+
+type stateVal struct {
+	height int
+	rocks  int
 }
 
 var exists = struct{}{}
@@ -57,6 +70,7 @@ func newBoard() board {
 	return board{
 		cave:      make(map[image.Point]any),
 		maxheight: 0,
+		minheight: 0,
 		nextRock:  FLAT,
 	}
 }
@@ -123,7 +137,7 @@ func rockHitsSide(r rock) bool {
 
 func (b board) printBoard(message string, r rock) {
 	fmt.Println(message)
-	for y := b.maxheight + 6; y >= 0; y-- {
+	for y := b.maxheight + 6; y >= b.minheight; y-- {
 		fmt.Print("|")
 		for x := 0; x < 7; x++ {
 			p := image.Point{x, y}
@@ -176,22 +190,31 @@ func (b *board) landRock(r rock) {
 	}
 }
 
-func run1(inputText string) int {
+func run1(inputText string, dropRocks int) int {
 
 	winds := strings.TrimSpace(inputText)
 	b := newBoard()
+	newStateKey := stateKey{
+		peaks:   [7]int{0, 0, 0, 0, 0, 0, 0},
+		windIdx: 0,
+		rockIdx: FLAT,
+	}
 	needNewRock := true
 	numMoves := 0
 	var fallingRock rock
-	for rockCount := 1; rockCount <= 2022; {
+	states := make(map[stateKey]stateVal)
+	doStateCheck := true
+	heightFromCycles := 0
+	for rockCount := 1; rockCount <= dropRocks; {
 		if needNewRock {
+			newStateKey.rockIdx = b.nextRock // add the rock we just added
 			fallingRock = b.makeNewRock()
 			//b.printBoard("new rock", fallingRock)
 			needNewRock = false
-
 		}
 		// read a rune from the input
 		windRune := winds[numMoves%len(winds)]
+		newStateKey.windIdx = numMoves % len(winds)
 		movedRock := fallingRock
 		switch windRune {
 		case '<':
@@ -211,18 +234,51 @@ func run1(inputText string) int {
 		if b.rockLands(movedRock) { // if it would overlap, it lands where it is
 			b.landRock(fallingRock)
 			needNewRock = true
-			rockCount++
 			//b.printBoard("landed", fallingRock)
+			if doStateCheck {
+				peaks := b.computeHeightmap()
+				newStateKey.peaks = peaks
+				sv, ok := states[newStateKey]
+				if ok {
+					// we've found a cycle between now and sv(StateValue)
+					log.Printf("newStateKey match after %d rocks, maxheight %d, prev height %d, delta %d", rockCount, b.maxheight, sv.height, b.maxheight-sv.height)
+					cycleLength := rockCount - sv.rocks                     // rocks per cycle
+					heightPerCycle := b.maxheight - sv.height               // how much does each cycle grow the stack
+					rocksLeft := dropRocks - rockCount                      // how many rocks do we have left to drop
+					cyclesRemaining := rocksLeft / cycleLength              // how many cycles until we're done (drop fractions)
+					heightFromCycles = heightPerCycle * cyclesRemaining     // how much height will all those cycles add
+					rockCount = rockCount + (cyclesRemaining * cycleLength) // how many rocks left to drop to complete the drops
+					doStateCheck = false                                    // we know the cycle, stop checking
+					// could reset the grid, but instead just continue as is, and add in the computed height change at the end
+					// the maxheight there will be height from before cycling and height from afer cycling
+					// i.e. .......[BUNCHA CYCLES].......done
+				}
+				states[newStateKey] = stateVal{
+					height: b.maxheight,
+					rocks:  rockCount,
+				}
+			}
+			rockCount++
+
 		} else {
 			fallingRock = movedRock
 		}
 		numMoves++
-		//b.printBoard("moved down", fallingRock)
 	}
-	return b.maxheight
+	return b.maxheight + heightFromCycles
 }
 
-func run2(inputText string) int {
-
-	return 0
+func (b *board) computeHeightmap() (heights [7]int) {
+	// compute heightmap
+	// this is dist from maxheight to the highest y in each column
+	for x := 0; x < 7; x++ {
+		for y := b.maxheight; y >= 0; y-- {
+			_, ok := b.cave[np(x, y)]
+			if ok {
+				heights[x] = b.maxheight - y
+				break
+			}
+		}
+	}
+	return
 }
