@@ -61,3 +61,27 @@ func TestSliceSubtract(t *testing.T) {
 		})
 	}
 }
+
+func TestKeyExists(t *testing.T) {
+	type args[K comparable, V any] struct {
+		m map[K]V
+		k K
+	}
+	type testCase[K comparable, V any] struct {
+		name string
+		args args[K, V]
+		want bool
+	}
+	tests := []testCase[string, bool]{
+		{name: "exists", args: args[string, bool]{map[string]bool{"foo": true, "bar": false}, "foo"}, want: true},
+		{name: "exists, falseval", args: args[string, bool]{map[string]bool{"foo": true, "bar": false}, "bar"}, want: true},
+		{name: "does not exist", args: args[string, bool]{map[string]bool{"foo": true, "bar": false}, "baz"}, want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := KeyExists(tt.args.m, tt.args.k); got != tt.want {
+				t.Errorf("KeyExists() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

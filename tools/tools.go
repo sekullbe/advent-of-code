@@ -167,3 +167,8 @@ func SliceSubtract[T comparable](a, b []T) []T {
 	}
 	return diff
 }
+
+func KeyExists[K comparable, V any](m map[K]V, k K) bool {
+	_, ok := m[k]
+	return ok
+}
