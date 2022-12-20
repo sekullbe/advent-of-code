@@ -40,6 +40,22 @@ func SplitByEmptyNewline(str string) []string {
 		Split(strNormalized, -1)
 }
 
+func SplitByEmptyNewlineToSlices(str string) [][]string {
+	strNormalized := regexp.
+		MustCompile("\r\n").
+		ReplaceAllString(str, "\n")
+
+	strGroups := regexp.
+		MustCompile(`\n\s*\n`).
+		Split(strNormalized, -1)
+	var ret [][]string
+	for _, group := range strGroups {
+		splitGroup := SplitByLines(group)
+		ret = append(ret, splitGroup)
+	}
+	return ret
+}
+
 func SplitByLines(str string) []string {
 	return strings.Split(strings.TrimSpace(str), "\n")
 }

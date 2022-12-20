@@ -172,3 +172,10 @@ func KeyExists[K comparable, V any](m map[K]V, k K) bool {
 	_, ok := m[k]
 	return ok
 }
+
+func Triangular(n int) (triangle int) {
+	for i := 1; i <= n; i++ {
+		triangle += i
+	}
+	return
+}

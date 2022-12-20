@@ -85,3 +85,28 @@ func TestKeyExists(t *testing.T) {
 		})
 	}
 }
+
+func Test_Triangular(t *testing.T) {
+	type args struct {
+		n int
+	}
+	tests := []struct {
+		name         string
+		args         args
+		wantTriangle int
+	}{
+		{name: "1", args: args{1}, wantTriangle: 1},
+		{name: "2", args: args{2}, wantTriangle: 3},
+		{name: "3", args: args{3}, wantTriangle: 6},
+		{name: "4", args: args{4}, wantTriangle: 10},
+		{name: "5", args: args{5}, wantTriangle: 15},
+		{name: "6", args: args{6}, wantTriangle: 21},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotTriangle := Triangular(tt.args.n); gotTriangle != tt.wantTriangle {
+				t.Errorf("triangular() = %v, want %v", gotTriangle, tt.wantTriangle)
+			}
+		})
+	}
+}

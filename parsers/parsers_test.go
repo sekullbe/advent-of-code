@@ -100,3 +100,27 @@ func TestStringsWithCommasToIntSlice(t *testing.T) {
 		})
 	}
 }
+
+func TestSplitByEmptyNewlineToSlices(t *testing.T) {
+	type args struct {
+		str string
+	}
+	tests := []struct {
+		name string
+		args args
+		want [][]string
+	}{
+		{
+			name: "basic",
+			args: args{str: "foo\n\nbar\none\ntwo\n\nbaz\nquux"},
+			want: [][]string{[]string{"foo"}, []string{"bar", "one", "two"}, []string{"baz", "quux"}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SplitByEmptyNewlineToSlices(tt.args.str); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SplitByEmptyNewlineToSlices() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
