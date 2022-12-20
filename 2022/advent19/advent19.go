@@ -24,8 +24,6 @@ const (
 	GEODEBOT
 )
 
-const MAX_TIME int = 24
-
 type resources struct {
 	ore    int
 	clay   int
@@ -64,6 +62,17 @@ func tick(s state) state {
 	return s
 }
 
+var triangular [33]int
+
+func init() {
+	triangular[0] = 0
+	for i := 1; i < 32; i++ {
+		triangular[i] = triangular[i-1] + i
+	}
+}
+
+var maximumbest = 0
+
 // input in example is multline but real input is one line
 // Blueprint 2: Each ore robot costs 4 ore. Each clay robot costs 3 ore. Each obs robot costs 2 ore and 5 clay. Each geode robot costs 2 ore and 10 obs.
 func parseBlueprint(line string) (bp blueprint) {
@@ -89,22 +98,25 @@ func (s *state) prune(goalbot int, bp blueprint, best int) bool {
 	if goalbot == OBSBOT && (s.claybots == 0 || s.obsbots >= bp.geodebot.obs) {
 		return true
 	}
-	// don't build geodebot if we have no obsbots or if we can't catch up to best geodes yet
+	// don't build geodebot if we have no obsbots
 	if goalbot == GEODEBOT && s.obsbots == 0 {
 		return true
 	}
-	/*
-		if s.geodes+s.geodebots*s.timeRemaining+tools.Triangular(s.timeRemaining) < best {
-			return true
-		}
-	*/
+
+	// punt if we can't catch up with the best yet
+	now := s.geodes + (s.geodebots * s.timeRemaining)
+	future := triangular[s.timeRemaining]
+
+	if now+future < best {
+		return true
+	}
 
 	return false
 }
 
-func simulate(s state, goalbot int, bp blueprint, overallBest int) int {
+func simulate(s state, goalbot int, bp blueprint) int {
 
-	if s.prune(goalbot, bp, overallBest) { // this branch won't work, prune it
+	if s.prune(goalbot, bp, maximumbest) { // this branch won't work, prune it
 		return 0
 	}
 
@@ -116,7 +128,7 @@ func simulate(s state, goalbot int, bp blueprint, overallBest int) int {
 			ns.orebots = ns.orebots + 1
 			ns.ore -= bp.orebot.ore
 			for goal := 0; goal <= 3; goal++ {
-				g := simulate(ns, goal, bp, best)
+				g := simulate(ns, goal, bp)
 				best = tools.MaxInt(best, g)
 			}
 			return best
@@ -126,7 +138,7 @@ func simulate(s state, goalbot int, bp blueprint, overallBest int) int {
 			ns.claybots = ns.claybots + 1
 			ns.ore -= bp.claybot.ore
 			for goal := 0; goal <= 3; goal++ {
-				g := simulate(ns, goal, bp, best)
+				g := simulate(ns, goal, bp)
 				best = tools.MaxInt(best, g)
 			}
 			return best
@@ -137,7 +149,7 @@ func simulate(s state, goalbot int, bp blueprint, overallBest int) int {
 			ns.ore -= bp.obsbot.ore
 			ns.clay -= bp.obsbot.clay
 			for goal := 0; goal <= 3; goal++ {
-				g := simulate(ns, goal, bp, best)
+				g := simulate(ns, goal, bp)
 				best = tools.MaxInt(best, g)
 			}
 			return best
@@ -148,7 +160,7 @@ func simulate(s state, goalbot int, bp blueprint, overallBest int) int {
 			ns.ore -= bp.geodebot.ore
 			ns.obs -= bp.geodebot.obs
 			for goal := 0; goal <= 3; goal++ {
-				g := simulate(ns, goal, bp, best)
+				g := simulate(ns, goal, bp)
 				best = tools.MaxInt(best, g)
 			}
 			return best
@@ -157,6 +169,7 @@ func simulate(s state, goalbot int, bp blueprint, overallBest int) int {
 		s = tick(s)
 	}
 	best = tools.MaxInt(s.geodes, best)
+	maximumbest = tools.MaxInt(best, maximumbest)
 	return best
 }
 
@@ -175,7 +188,7 @@ func run1(inputText string, ticks int) int {
 				resources:     resources{},
 				bots:          bots{orebots: 1},
 			}
-			geodes := simulate(s, goal, bp, best)
+			geodes := simulate(s, goal, bp)
 			//log.Printf("BP %d produced %d geodes stating with goal %d", bp.number, best, goal)
 			best = tools.MaxInt(best, geodes)
 		}
@@ -194,6 +207,7 @@ func run2(inputText string, ticks int) int {
 	}
 	totalScore := 1
 	for i, bp := range blueprints {
+		maximumbest = 0
 		best := 0
 		for goal := 0; goal <= 3; goal++ {
 			s := state{
@@ -201,7 +215,7 @@ func run2(inputText string, ticks int) int {
 				resources:     resources{},
 				bots:          bots{orebots: 1},
 			}
-			geodes := simulate(s, goal, bp, best)
+			geodes := simulate(s, goal, bp)
 			//log.Printf("BP %d produced %d geodes stating with goal %d", bp.number, best, goal)
 			best = tools.MaxInt(best, geodes)
 		}
@@ -211,6 +225,5 @@ func run2(inputText string, ticks int) int {
 			break
 		}
 	}
-
 	return totalScore
 }
