@@ -110,3 +110,28 @@ func Test_Triangular(t *testing.T) {
 		})
 	}
 }
+
+func Test_MoveElt(t *testing.T) {
+	type args struct {
+		array    []int
+		srcIndex int
+		dstIndex int
+	}
+	tests := []struct {
+		name string
+		args args
+		want []int
+	}{
+		{name: "still", args: args{array: []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}, srcIndex: 3, dstIndex: 3}, want: []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}},
+		{name: "simple +1", args: args{array: []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}, srcIndex: 3, dstIndex: 4}, want: []int{9, 8, 7, 5, 6, 4, 3, 2, 1, 0}},
+		{name: "simple +2", args: args{array: []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}, srcIndex: 3, dstIndex: 5}, want: []int{9, 8, 7, 5, 4, 6, 3, 2, 1, 0}},
+		{name: "left -5", args: args{array: []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}, srcIndex: 5, dstIndex: 0}, want: []int{4, 9, 8, 7, 6, 5, 3, 2, 1, 0}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := MoveElt(tt.args.array, tt.args.srcIndex, tt.args.dstIndex); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("moveElt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

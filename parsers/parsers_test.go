@@ -67,6 +67,11 @@ func TestStringsToIntSlice(t *testing.T) {
 			args: args{inputText: "1 1 1 1 3\n 2 3 4 5 6\n"},
 			want: []int{1, 1, 1, 1, 3, 2, 3, 4, 5, 6},
 		},
+		{
+			name: "one number per line",
+			args: args{inputText: "1\n2\n-3\n3\n-2\n0\n4\n"},
+			want: []int{1, 2, -3, 3, -2, 0, 4},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
