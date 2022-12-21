@@ -180,7 +180,6 @@ func Triangular(n int) (triangle int) {
 	return
 }
 
-// here's the fucking bug, if you delete before you insert, you insert in the wrong place
 // these do no bounds checking. TODO make them return error
 func InsertElt[T any](array []T, value T, index int) []T {
 	return append(array[:index], append([]T{value}, array[index:]...)...)
@@ -191,10 +190,10 @@ func RemoveElt[T any](array []T, index int) []T {
 }
 
 func MoveElt[T any](array []T, srcIndex int, dstIndex int) []T {
-	value := array[srcIndex]
-	//if dstIndex < srcIndex {
-	//	dstIndex += 1
-	//}
-	r := RemoveElt(array, srcIndex)
-	return InsertElt(r, value, dstIndex)
+	// clever appending from https://github.com/mnml/aoc/
+	elt := array[srcIndex]
+	array = append(array[:srcIndex], array[srcIndex+1:]...)
+	array = append(array[:dstIndex], append([]T{elt}, array[dstIndex:]...)...)
+	return array
+
 }
