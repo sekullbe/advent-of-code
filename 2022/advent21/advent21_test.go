@@ -21,20 +21,6 @@ lgvd: ljgn * ptdq
 drzm: hmdt - zczc
 hmdt: 32`
 
-/*
-	{name: "1 number", args: args{lines: []string{"abcd: 17"}}, want: formulas{}, want1: numbers{"abcd": 17}},
-	{name: "1 formula", args: args{lines: []string{"zxcv: qwer + tyui"}},
-		want: formulas{"qwer": &formula{yeller: "zxcv", op1: "qwer", op2: "tyui", operator: '+'},
-			"tyui": &formula{yeller: "zxcv", op1: "qwer", op2: "tyui", operator: '+'}},
-		want1: numbers{}},
-	{name: "1 both", args: args{lines: []string{"abcd: 17", "zxcv: qwer + tyui"}},
-		want: formulas{"qwer": &formula{yeller: "zxcv", op1: "qwer", op2: "tyui", operator: '+'},
-			"tyui": &formula{yeller: "zxcv", op1: "qwer", op2: "tyui", operator: '+'}},
-		want1: numbers{"abcd": 17}},
-	//scaffolding test to prove that each monkey only appears in one formula
-	//{name: "quick duplicate test", args: args{lines: parsers.SplitByLines(inputText)}, want: formulas{}, want1: numbers{}},
-*/
-
 func Test_run1(t *testing.T) {
 	type args struct {
 		inputText string
@@ -95,6 +81,48 @@ func Test_parseMonkeys(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got2, tt.want2) {
 				t.Errorf("parseMonkeys() got2 = %v, want %v", got2, tt.want2)
+			}
+		})
+	}
+}
+
+func Test_run2(t *testing.T) {
+	type args struct {
+		inputText string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "sample", args: args{inputText: testmonkeys}, want: 302},
+		{name: "live", args: args{inputText: inputText}, want: 3_882_224_466_191},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run2(tt.args.inputText); got != tt.want {
+				t.Errorf("run2() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_run2_eval(t *testing.T) {
+	type args struct {
+		inputText string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "sample", args: args{inputText: testmonkeys}, want: 0},
+		{name: "live", args: args{inputText: inputText}, want: 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run2_eval(tt.args.inputText); got != tt.want {
+				t.Errorf("run2() = %v, want %v", got, tt.want)
 			}
 		})
 	}
