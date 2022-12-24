@@ -17,7 +17,6 @@ func main() {
 	fmt.Println("-------------")
 	fmt.Printf("Magic number: %d\n", run2(inputText))
 	fmt.Println("-------------")
-	//koblas(parsers.SplitByLines(inputText))
 }
 
 func parseElves(lines []string) *board {
@@ -76,20 +75,22 @@ func (e *elf) decideProposal() image.Point {
 		}
 		pdir = (pdir + 2) % 8 // because we're traversing the major points only
 	}
-	// we got nothing, so propose standing still. does that need a separate return?
 	return e.Point
 }
 
-func (e *elf) move(newPoint image.Point) {
+// returns true if actually moved
+func (e *elf) move(newPoint image.Point) bool {
 	if e.Point != newPoint {
 		e.board.grove[newPoint] = e
 		delete(e.board.grove, e.Point)
 		e.Point = newPoint
 		e.proposalPoint = e.Point
+		return true
 	}
+	return false
 }
 
-func (b *board) round() {
+func (b *board) round() int {
 	proposals := make(map[image.Point][]*elf)
 	for _, e := range b.elves {
 		pp := e.decideProposal()
@@ -99,15 +100,20 @@ func (b *board) round() {
 		}
 	}
 	// 2nd half- look at all the proposals and if only one elf proposes to move to a point, move it
+	moves := 0
 	for proposedPoint, elves := range proposals {
 		if len(elves) == 1 {
-			elves[0].move(proposedPoint)
+			moved := elves[0].move(proposedPoint)
+			if moved {
+				moves++
+			}
 		}
 	}
 
 	// rotate the proposal pointer for the next turn
 	b.proposalDir = (b.proposalDir + 2) % 8
 	//fmt.Printf("New scan dir: %d\n", b.proposalDir)
+	return moves
 }
 
 func (b *board) score() int {
@@ -158,7 +164,11 @@ func run1(input string) int {
 	return score
 }
 
-func run2(inputText string) int {
+func run2(input string) int {
+	b := parseElves(parsers.SplitByLines(input))
 
-	return 0
+	round := 1
+	for ; b.round() > 0; round++ {
+	}
+	return round
 }
