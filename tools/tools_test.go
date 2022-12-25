@@ -135,3 +135,49 @@ func Test_MoveElt(t *testing.T) {
 		})
 	}
 }
+
+func TestReverseString(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name: "basic", args: args{s: "basic"}, want: "cisab"},
+		{name: "empty", args: args{s: ""}, want: ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ReverseString(tt.args.s); got != tt.want {
+				t.Errorf("ReverseString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// returns slice in reverse order
+func TestBaseConvert(t *testing.T) {
+	type args struct {
+		x    int
+		base int
+	}
+	tests := []struct {
+		name string
+		args args
+		want []int
+	}{
+		{name: "17 base 18", args: args{x: 17, base: 8}, want: []int{1, 2}},
+		{name: "1 base 5", args: args{x: 1, base: 5}, want: []int{1}},         // 1
+		{name: "5 base 5", args: args{x: 5, base: 5}, want: []int{0, 1}},      // 0 + 5*1
+		{name: "27 base 5", args: args{x: 27, base: 5}, want: []int{2, 0, 1}}, // 2 + 0*5 + 1*5^2
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := BaseConvert(tt.args.x, tt.args.base); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("BaseConvert() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

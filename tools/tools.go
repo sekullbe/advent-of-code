@@ -197,3 +197,19 @@ func MoveElt[T any](array []T, srcIndex int, dstIndex int) []T {
 	return array
 
 }
+
+func ReverseString(s string) string {
+	return string(Reverse([]byte(s)))
+}
+
+func BaseConvert(x int, base int) []int {
+	if x == 0 {
+		return []int{0}
+	}
+	r := []int{}
+	for x > 0 {
+		r = append(r, x%base)
+		x /= base
+	}
+	return r
+}
