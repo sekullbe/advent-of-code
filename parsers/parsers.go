@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// TODO Many of the thing there can be done with fmt.Fscanf, fmt.Sscan, etc.
+// TODO Many of the things here can be done with fmt.Fscanf, fmt.Sscan, etc.
 
 func StringsToIntSlice(inputText string) []int {
 	dataSetStr := strings.Fields(inputText)

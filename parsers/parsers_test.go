@@ -118,7 +118,7 @@ func TestSplitByEmptyNewlineToSlices(t *testing.T) {
 		{
 			name: "basic",
 			args: args{str: "foo\n\nbar\none\ntwo\n\nbaz\nquux"},
-			want: [][]string{[]string{"foo"}, []string{"bar", "one", "two"}, []string{"baz", "quux"}},
+			want: [][]string{{"foo"}, {"bar", "one", "two"}, {"baz", "quux"}},
 		},
 	}
 	for _, tt := range tests {
