@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/sekullbe/advent/2019/computer"
+	"github.com/sekullbe/advent/2019/advent02/computer"
 	"github.com/sekullbe/advent/parsers"
 )
 
