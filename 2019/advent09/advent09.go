@@ -28,7 +28,7 @@ func run1(inputText string) int {
 }
 
 func run2(inputText string) int {
-	c := computer.NewComputer(parsers.StringsWithCommasToInt64Slice(inputText), []int64{5})
+	c := computer.NewComputer(parsers.StringsWithCommasToInt64Slice(inputText), []int64{2})
 	c.Run()
 	for _, o := range c.GetOutputs() {
 		fmt.Println(o)

@@ -30,6 +30,17 @@ func StringsWithCommasToIntSlice(inputText string) []int {
 	return dataSet
 }
 
+func StringsWithCommasToInt64Slice(inputText string) []int64 {
+	dataSetStr := strings.Split(inputText, ",")
+	var dataSet []int64
+	for _, s := range dataSetStr {
+		if i, err := strconv.Atoi(strings.TrimSpace(s)); err == nil {
+			dataSet = append(dataSet, int64(i))
+		}
+	}
+	return dataSet
+}
+
 func SplitByEmptyNewline(str string) []string {
 	strNormalized := regexp.
 		MustCompile("\r\n").
