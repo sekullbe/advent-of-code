@@ -41,22 +41,20 @@ func calcCalibrationDigitsOnly(line string) int {
 
 	zero := '0'
 	nine := '9'
-	_ = zero
-	_ = nine
 
 	for _, r := range line {
-		if r >= '0' && r <= '9' {
+		if r >= zero && r <= nine {
 			first = r
 			break
 		}
 	}
 	for _, r := range tools.ReverseString(line) {
-		if r >= '0' && r <= '9' {
+		if r >= zero && r <= nine {
 			last = r
 			break
 		}
 	}
-	return int((first-'0')*10 + last - '0')
+	return int((tools.RuneToDigit(first))*10 + tools.RuneToDigit(last))
 }
 
 // This is kind of a gross hack- replace the number strings with a string that contains
@@ -77,10 +75,3 @@ func replaceStringDigits(line string) string {
 	out = strings.Replace(out, "nine", "nine9nine", -1)
 	return out
 }
-
-/*
-func findFirstDigit(line string) int {
-	var digits = regexp.MustCompile("(one|two|three|four|five|six|seven|eight|nine|\\d)")
-
-}
-*/

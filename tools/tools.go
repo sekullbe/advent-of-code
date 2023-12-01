@@ -213,3 +213,7 @@ func BaseConvert(x int, base int) []int {
 	}
 	return r
 }
+
+func RuneToDigit(r rune) int32 {
+	return r - '0'
+}
