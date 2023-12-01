@@ -65,16 +65,16 @@ func calcCalibrationDigitsOnly(line string) int {
 // that is really first.
 func replaceStringDigits(line string) string {
 	out := line
-	out = strings.Replace(out, "zero", "ze0ro", -1)
-	out = strings.Replace(out, "one", "o1ne", -1)
-	out = strings.Replace(out, "two", "tw2o", -1)
-	out = strings.Replace(out, "three", "thr3ee", -1)
-	out = strings.Replace(out, "four", "fo4ur", -1)
-	out = strings.Replace(out, "five", "fi5ve", -1)
-	out = strings.Replace(out, "six", "si6x", -1)
-	out = strings.Replace(out, "seven", "se7ven", -1)
-	out = strings.Replace(out, "eight", "eig8ht", -1)
-	out = strings.Replace(out, "nine", "ni9ne", -1)
+	out = strings.Replace(out, "zero", "zero0zero", -1)
+	out = strings.Replace(out, "one", "one1one", -1)
+	out = strings.Replace(out, "two", "two2two", -1)
+	out = strings.Replace(out, "three", "three3three", -1)
+	out = strings.Replace(out, "four", "four4four", -1)
+	out = strings.Replace(out, "five", "five5five", -1)
+	out = strings.Replace(out, "six", "six6six", -1)
+	out = strings.Replace(out, "seven", "seven7seven", -1)
+	out = strings.Replace(out, "eight", "eight8eight", -1)
+	out = strings.Replace(out, "nine", "nine9nine", -1)
 	return out
 }
 
