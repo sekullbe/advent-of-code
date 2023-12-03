@@ -2,7 +2,10 @@ package main
 
 // getting towards a generic grid implementation, not there yet
 
-import "image"
+import (
+	mapset "github.com/deckarep/golang-set/v2"
+	"image"
+)
 
 const (
 	IDLE = iota
@@ -16,11 +19,19 @@ const (
 	NORTHWEST
 )
 
+// generalized grid impl will provide this
+type baseSquare struct {
+	id    int
+	Point image.Point
+}
+
+// and a user will add this
 type square struct {
-	id int
-	image.Point
+	baseSquare
 	contents         rune
 	adjacentToSymbol bool
+	adjacentGears    mapset.Set[image.Point]
+	adjacentNumbers  []int
 }
 
 func Pt(x, y int) image.Point {
@@ -49,13 +60,23 @@ func neighborInDirection(p image.Point, dir int) (neighbor image.Point) {
 	return
 }
 
-// TODO at some point make a generalized grid implementation
-// with generic contents and a parser
+// At some point I should make a generalized grid implementation with generic contents and a parser
+// have to think about what the interface would be
 type grid map[image.Point]*square
 
 type board struct {
 	grid
 	maxX, maxY int // min is always 0
+}
+
+func newSquare(p image.Point, contents rune) square {
+	return square{
+		baseSquare:       baseSquare{Point: p},
+		contents:         contents,
+		adjacentToSymbol: false,
+		adjacentGears:    mapset.NewSet[image.Point](),
+		adjacentNumbers:  nil,
+	}
 }
 
 func parseBoard(lines []string) *board {
@@ -77,7 +98,7 @@ func parseBoard(lines []string) *board {
 				continue
 			}
 			p := Pt(x, y)
-			t := square{Point: p, contents: tc}
+			t := newSquare(p, tc)
 			b.grid[p] = &t
 		}
 	}
@@ -93,6 +114,9 @@ func (b *board) checkNeighborsForSymbol(p image.Point) {
 		if ok && isSymbol(n.contents) {
 			s := b.grid[p]
 			s.adjacentToSymbol = true
+			if isGear(n.contents) {
+				s.adjacentGears.Add(dp)
+			}
 			b.grid[p] = s
 		}
 	}
@@ -108,4 +132,8 @@ func isNumber(r rune) bool {
 
 func isBlank(r rune) bool {
 	return r == '.'
+}
+
+func isGear(r rune) bool {
+	return r == '*'
 }
