@@ -26,16 +26,17 @@ func Test_parseCard(t *testing.T) {
 		{
 			name: "test",
 			args: args{
-				card: "Card 11: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
+				card: "Card  1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
 			},
-			wantCardNum: 11,
+			wantCardNum: 1,
 			wantWinners: []int{41, 48, 83, 86, 17},
 			wantNumbers: []int{83, 86, 6, 31, 17, 9, 48, 53},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotCardNum, gotWinners, gotNumbers := parseCard(tt.args.card)
+			gotCardNum, gotWinners, gotNumbers, err := parseCard(tt.args.card)
+			_ = err
 			if gotCardNum != tt.wantCardNum {
 				t.Errorf("parseCard() gotCardNum = %v, want %v", gotCardNum, tt.wantCardNum)
 			}
@@ -83,18 +84,54 @@ func Test_run1(t *testing.T) {
 		args args
 		want int
 	}{
-		{
-			name: "sample",
-			args: args{
-				inputText: sampleInput,
-			},
-			want: 13,
-		},
+		{name: "sample", args: args{inputText: sampleInput}, want: 13},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := run1(tt.args.inputText); got != tt.want {
 				t.Errorf("run1() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_countWinningNumbersInCard(t *testing.T) {
+	type args struct {
+		winners []int
+		numbers []int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "simple", args: args{winners: []int{41, 48, 83, 86, 17}, numbers: []int{83, 86, 6, 31, 17, 9, 48, 53}}, want: 4},
+		{name: "none", args: args{winners: []int{87, 83, 26, 28, 32}, numbers: []int{88, 30, 70, 12, 93, 22, 82, 36}}, want: 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := countWinningNumbersInCard(tt.args.winners, tt.args.numbers); got != tt.want {
+				t.Errorf("countWinningNumbersInCard() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_run2(t *testing.T) {
+	type args struct {
+		inputText string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "sample", args: args{inputText: sampleInput}, want: 30},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run2(tt.args.inputText); got != tt.want {
+				t.Errorf("run2() = %v, want %v", got, tt.want)
 			}
 		})
 	}

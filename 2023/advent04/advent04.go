@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/sekullbe/advent/parsers"
 	"github.com/sekullbe/advent/tools"
 	"regexp"
@@ -31,8 +32,26 @@ func run1(inputText string) int {
 }
 
 func run2(inputText string) int {
+	totalCards := 0
+	copies := make(map[int]int)
+	cardLines := parsers.SplitByLines(inputText)
 
-	return 0
+	for _, cardLine := range cardLines {
+		cardNum, winners, numbers, err := parseCard(cardLine)
+		if err != nil {
+			continue
+		}
+		copies[cardNum]++ // initial card
+		winCount := countWinningNumbersInCard(winners, numbers)
+		for i := cardNum + 1; i <= cardNum+winCount; i++ {
+			copies[i] += copies[cardNum]
+		}
+	}
+	for _, numCopies := range copies {
+		totalCards += numCopies
+	}
+
+	return totalCards
 }
 
 func parseCard(card string) (gameNum int, winners []int, numbers []int, err error) {
@@ -48,6 +67,13 @@ func parseCard(card string) (gameNum int, winners []int, numbers []int, err erro
 	return
 }
 
+func countWinningNumbersInCard(winners, numbers []int) int {
+	wset := mapset.NewSet[int](winners...)
+	nset := mapset.NewSet[int](numbers...)
+	winnersOnly := wset.Intersect(nset)
+	return winnersOnly.Cardinality()
+}
+
 func evaluateOneCard(card string) (score int) {
 	_, winningNums, gameNums, err := parseCard(card)
 	if err != nil {
@@ -56,7 +82,6 @@ func evaluateOneCard(card string) (score int) {
 	// parse the winning numbers as keys into a map 'winners' with val -1
 	// for each card number, if it's in the map, winners[num]++
 	// then iterate the keys, if val > 0, score += 2^(winners[num])
-	// could use one map, but meh
 	winners := make(map[int]int)
 	for _, winner := range winningNums {
 		winners[winner] = 0
