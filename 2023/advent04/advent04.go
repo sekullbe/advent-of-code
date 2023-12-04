@@ -79,9 +79,6 @@ func evaluateOneCard(card string) (score int) {
 	if err != nil {
 		return 0
 	}
-	// parse the winning numbers as keys into a map 'winners' with val -1
-	// for each card number, if it's in the map, winners[num]++
-	// then iterate the keys, if val > 0, score += 2^(winners[num])
 	winners := make(map[int]int)
 	for _, winner := range winningNums {
 		winners[winner] = 0
