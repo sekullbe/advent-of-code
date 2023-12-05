@@ -28,7 +28,7 @@ func run1(input string) int {
 	for _, seed := range seedNums {
 		working := seed
 		for _, mapName := range processingOrder {
-			working = mapSectionLookup(working, mapOfSections[mapName])
+			working = mapSectionCompute(working, mapOfSections[mapName])
 		}
 		minLoc = min(working, minLoc)
 	}
@@ -40,7 +40,6 @@ func run1(input string) int {
 func run1BruteForce(input string) int {
 
 	seedNums, mapOfMaps := parseAllMaps(input)
-	// hmmm is it useful to store the intermediate values in a map? i doubt it
 	minLoc := math.MaxInt
 	for _, seed := range seedNums {
 		working := seed
@@ -53,9 +52,25 @@ func run1BruteForce(input string) int {
 	return minLoc
 }
 
-func run2(inputText string) int {
+func run2(input string) int {
 
-	return 0
+	seedNumRanges, mapOfSections := parseAllMapSectionsToStructs(input)
+	// again, don't precalculate the map, do it on the fly.. that'll still be a lot but we won't have to precompute or stash it
+	minLoc := math.MaxInt
+	for i := 0; i < len(seedNumRanges); i += 2 {
+		start := seedNumRanges[i]
+		length := seedNumRanges[i+1]
+		fmt.Printf("starting seed sequence %d with length %d\n", start, length)
+		for seed := start; seed < start+length; seed++ {
+			working := seed
+			for _, mapName := range processingOrder {
+				working = mapSectionCompute(working, mapOfSections[mapName])
+			}
+			minLoc = min(working, minLoc)
+		}
+	}
+	return minLoc
+
 }
 
 // preloading all the maps works and solves the sample problem, but it is dog slow and uses vast memory. do better.
@@ -141,9 +156,9 @@ func parseAllMapSectionsToStructs(allLines string) (seedNums []int, mapOfSection
 	return seedNums, mapOfSections
 }
 
-func mapSectionLookup(key int, sections []mapSection) int {
+func mapSectionCompute(key int, sections []mapSection) int {
 	for _, section := range sections {
-		val := mapSectionLookupOneSection(key, section)
+		val := mapSectionComputeOneSection(key, section)
 		if val != key {
 			return val
 		}
@@ -151,7 +166,7 @@ func mapSectionLookup(key int, sections []mapSection) int {
 	return key
 }
 
-func mapSectionLookupOneSection(key int, section mapSection) int {
+func mapSectionComputeOneSection(key int, section mapSection) int {
 	if key >= section.sourceStart && key < section.sourceStart+(section.rangeLength) {
 		return section.destStart + (key - section.sourceStart)
 	}

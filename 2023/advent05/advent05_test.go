@@ -60,7 +60,7 @@ func Test_run1(t *testing.T) {
 	}
 }
 
-func Test_mapSectionLookupOneSection(t *testing.T) {
+func Test_mapSectionComputeOneSection(t *testing.T) {
 	type args struct {
 		key     int
 		section mapSection
@@ -77,8 +77,34 @@ func Test_mapSectionLookupOneSection(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := mapSectionLookupOneSection(tt.args.key, tt.args.section); got != tt.want {
-				t.Errorf("mapSectionLookupOneSection() = %v, want %v", got, tt.want)
+			if got := mapSectionComputeOneSection(tt.args.key, tt.args.section); got != tt.want {
+				t.Errorf("mapSectionComputeOneSection() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_run2(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "sample text",
+			args: args{
+				input: sampleText,
+			},
+			want: 46,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run2(tt.args.input); got != tt.want {
+				t.Errorf("run2() = %v, want %v", got, tt.want)
 			}
 		})
 	}
