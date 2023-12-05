@@ -14,12 +14,12 @@ func main() {
 	fmt.Printf("Magic number: %d\n", run2(inputText))
 }
 
-func run1(inputText string) int {
+func run1(input string) int {
 
 	return 0
 }
 
-func run2(inputText string) int {
+func run2(input string) int {
 
 	return 0
 }
