@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/sekullbe/advent/parsers"
+	"github.com/sekullbe/advent/tools"
 	"strings"
 )
 
@@ -32,8 +33,8 @@ func run1(input string) int {
 }
 
 func run2(input string) int {
-
-	return 0
+	race := parseRacesToOneRace(parsers.SplitByLines(input))
+	return evalOneRaceOptimized(race)
 }
 
 func evalOneRace(r race) int {
@@ -76,4 +77,12 @@ func parseRaces(lines []string) []race {
 		races = append(races, race{duration: times[i], recordDistance: dists[i]})
 	}
 	return races
+}
+
+func parseRacesToOneRace(lines []string) race {
+	timeStr := strings.Join(strings.Fields(strings.Split(lines[0], ":")[1]), "")
+	distStr := strings.Join(strings.Fields(strings.Split(lines[1], ":")[1]), "")
+	dur := tools.Atoi(timeStr)
+	dist := tools.Atoi(distStr)
+	return race{duration: dur, recordDistance: dist}
 }

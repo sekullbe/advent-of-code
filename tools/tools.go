@@ -217,3 +217,11 @@ func BaseConvert(x int, base int) []int {
 func RuneToDigit(r rune) int32 {
 	return r - '0'
 }
+
+// thanks https://github.com/HattoriHanzo031/AoC_2023/blob/main/utils/utils.go
+func Must[T any](v T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
