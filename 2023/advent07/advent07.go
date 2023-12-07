@@ -1,11 +1,12 @@
 package main
 
 import (
+	"cmp"
 	_ "embed"
 	"fmt"
 	"github.com/sekullbe/advent/parsers"
 	"github.com/sekullbe/advent/tools"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -26,7 +27,7 @@ type hand struct {
 }
 
 var cardValues = map[rune]int{
-	'A': 14, 'K': 13, 'Q': 12, 'J': 1, 'T': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2,
+	'A': 14, 'K': 13, 'Q': 12, 'J': 11, 'T': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2,
 }
 
 const (
@@ -43,7 +44,8 @@ func run1(input string) int {
 	score := 0
 	hands := parseHands(parsers.SplitByLines(input), false)
 	// sort in inverse order
-	sort.Slice(hands, func(i, j int) bool { return hands[i].score < hands[j].score })
+	slices.SortFunc(hands, func(i, j hand) int { return cmp.Compare(i.score, j.score) })
+	//sort.Slice(hands, func(i, j int) bool { return hands[i].score < hands[j].score })
 	for i, h := range hands {
 		score += (i + 1) * h.bid
 	}
@@ -52,9 +54,11 @@ func run1(input string) int {
 
 func run2(input string) int {
 	score := 0
+	cardValues['J'] = 1 // reset for joker
 	hands := parseHands(parsers.SplitByLines(input), true)
 	// sort in inverse order
-	sort.Slice(hands, func(i, j int) bool { return hands[i].score < hands[j].score })
+	slices.SortFunc(hands, func(i, j hand) int { return cmp.Compare(i.score, j.score) })
+	//sort.Slice(hands, func(i, j int) bool { return hands[i].score < hands[j].score })
 	for i, h := range hands {
 		score += (i + 1) * h.bid
 	}
