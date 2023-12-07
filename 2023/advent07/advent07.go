@@ -137,12 +137,10 @@ func handTypeWithJoker(h hand) int {
 	if jokers == 0 {
 		return ht
 	}
-	if jokers == 5 {
+	if jokers >= 4 {
 		return FIVE
 	}
 	switch ht {
-	case FIVE:
-		return FIVE
 	case FOUR:
 		return FIVE
 	case THREE:
@@ -150,12 +148,10 @@ func handTypeWithJoker(h hand) int {
 			return FIVE
 		}
 		return FOUR
-	case FULL:
-		return FULL
 	case TWO_PAIR:
 		return FULL
 	case ONE_PAIR:
-		if jokers >= 3 {
+		if jokers == 3 {
 			return FIVE
 		}
 		if jokers == 2 {
@@ -163,9 +159,6 @@ func handTypeWithJoker(h hand) int {
 		}
 		return THREE
 	case HIGH:
-		if jokers == 4 {
-			return FIVE
-		}
 		if jokers == 3 {
 			return FOUR
 		}
