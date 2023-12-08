@@ -7,10 +7,10 @@ require (
 	github.com/deckarep/golang-set/v2 v2.5.0
 	github.com/mxschmitt/golang-combinations v1.2.0
 	github.com/oleiade/reflections v1.0.1
-	github.com/samber/lo v1.36.0
-	github.com/stretchr/testify v1.8.0
+	github.com/samber/lo v1.39.0
+	github.com/stretchr/testify v1.8.4
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869
-	golang.org/x/exp v0.0.0-20221205204356-47842c84f3db
+	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb
 	gopkg.in/karalabe/cookiejar.v2 v2.0.0-20150724131613-8dcd6a7f4951
 )
 
