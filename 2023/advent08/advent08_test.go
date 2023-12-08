@@ -21,6 +21,17 @@ AAA = (BBB, BBB)
 BBB = (AAA, ZZZ)
 ZZZ = (ZZZ, ZZZ)`
 
+const sampleInputPart2 = `LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)`
+
 func Test_parseOneNode(t *testing.T) {
 	type args struct {
 		input string
@@ -85,6 +96,50 @@ func Test_run1(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := run1(tt.args.input); got != tt.want {
 				t.Errorf("run1() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_run2(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "sample2", args: args{input: sampleInputPart2}, want: 6},
+		{name: "sample1a", args: args{input: sampleInput1}, want: 2},
+		{name: "sample1b", args: args{input: sampleInput2}, want: 6},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run2(tt.args.input); got != tt.want {
+				t.Errorf("run2() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_run2_slow(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "sample", args: args{input: sampleInputPart2}, want: 6},
+		{name: "sample", args: args{input: sampleInput1}, want: 2},
+		{name: "sample", args: args{input: sampleInput2}, want: 6},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run2_slow_solution(tt.args.input); got != tt.want {
+				t.Errorf("run2() = %v, want %v", got, tt.want)
 			}
 		})
 	}

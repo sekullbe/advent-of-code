@@ -225,3 +225,24 @@ func Must[T any](v T, err error) T {
 	}
 	return v
 }
+
+func GCD(a, b int) int {
+	for b != 0 {
+		t := b
+		b = a % b
+		a = t
+	}
+	return a
+}
+
+func LCM(a, b int, integers ...int) int {
+	result := a * b / GCD(a, b)
+	for i := 0; i < len(integers); i++ {
+		result = LCM(result, integers[i])
+	}
+	return result
+}
+
+func LCM_slice(integers ...int) int {
+	return LCM(integers[0], integers[1], integers[2:]...)
+}
