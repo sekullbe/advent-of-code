@@ -181,3 +181,27 @@ func TestBaseConvert(t *testing.T) {
 		})
 	}
 }
+
+// Doesn't work if T is itself a slice
+func Test_lastElt(t *testing.T) {
+	type args[T any] struct {
+		sl []T
+	}
+	type testCase[T any] struct {
+		name string
+		args args[T]
+		want T
+	}
+	tests := []testCase[int]{
+		{name: "simple", args: args[int]{sl: []int{1, 2, 3, 4, 5}}, want: 5},
+		{name: "one", args: args[int]{sl: []int{4}}, want: 4},
+		//{name: "zero len", args: args[int]{sl: []int{}}, want: 5}, // this will panic
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := LastElt(tt.args.sl); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("LastElt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

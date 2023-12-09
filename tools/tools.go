@@ -195,7 +195,13 @@ func MoveElt[T any](array []T, srcIndex int, dstIndex int) []T {
 	array = append(array[:srcIndex], array[srcIndex+1:]...)
 	array = append(array[:dstIndex], append([]T{elt}, array[dstIndex:]...)...)
 	return array
+}
 
+func LastElt[T any](sl []T) T {
+	if len(sl) == 0 {
+		panic("can't take last element of empty slice")
+	}
+	return sl[len(sl)-1]
 }
 
 func ReverseString(s string) string {
