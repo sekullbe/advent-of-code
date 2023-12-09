@@ -185,6 +185,10 @@ func InsertElt[T any](array []T, value T, index int) []T {
 	return append(array[:index], append([]T{value}, array[index:]...)...)
 }
 
+func PrependElt[T any](array []T, value T) []T {
+	return InsertElt(array, value, 0)
+}
+
 func RemoveElt[T any](array []T, index int) []T {
 	return append(array[:index], array[index+1:]...)
 }

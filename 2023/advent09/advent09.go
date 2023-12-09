@@ -32,7 +32,15 @@ func run1(input string) int {
 
 func run2(input string) int {
 	sequenceCache = make(map[string][]int)
-	return 0
+	sequenceCache = make(map[string][]int)
+	sum := 0
+	for _, line := range parsers.SplitByLines(input) {
+		seq := parsers.StringsToIntSlice(line)
+		seqs := repeatdiff(seq)
+		e := backxtrapolate(seqs)
+		sum += e
+	}
+	return sum
 }
 
 // given a slice of numbers produce the slice of differences
@@ -79,7 +87,23 @@ func extrapolate(sequences [][]int) int {
 		sequences[row] = append(sequences[row], newElt)
 	}
 	return newElt
+}
 
+func backxtrapolate(sequences [][]int) int {
+	// starting at the bottom...
+	// *prepend* a zero to the last sequence, call it seq[n]
+	// now append new value X to seq[n-1] such that X= lastElt(seq[n-1]) + lastElt(seq[n])
+	// repeat up the chain and return X of the original seq[0]
+	sequences[len(sequences)-1] = tools.PrependElt(sequences[len(sequences)-1], 0)
+	newElt := 0
+	for row := len(sequences) - 2; row >= 0; row-- {
+		// could do this more efficiently without intermediates but it's easier to read and debug
+		seq := sequences[row]
+		seqBelow := sequences[row+1]
+		newElt = seq[0] - seqBelow[0]
+		sequences[row] = tools.PrependElt(sequences[row], newElt)
+	}
+	return newElt
 }
 
 func isZeroSlice(s []int) bool {
