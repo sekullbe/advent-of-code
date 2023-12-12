@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func Test_validateRow(t *testing.T) {
 	type args struct {
@@ -79,6 +82,91 @@ func Test_countPossibleArrangements(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := countPossibleArrangements(tt.args.n); got != tt.want {
 				t.Errorf("countPossibleArrangements() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_run2(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "trivial1", args: args{input: ".# 1"}, want: 1},
+		{name: "sample1", args: args{input: "???.### 1,1,3"}, want: 1},
+		{name: "sample2", args: args{input: ".??..??...?##. 1,1,3"}, want: 16384},
+		{name: "sample3", args: args{input: "?#?#?#?#?#?#?#? 1,3,1,6"}, want: 1},
+		{name: "sample4", args: args{input: "????.#...#... 4,1,1"}, want: 16},
+		{name: "sample5", args: args{input: "????.######..#####. 1,6,5"}, want: 2500},
+		{name: "sample6", args: args{input: "?###???????? 3,2,1"}, want: 506250},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run2(tt.args.input); got != tt.want {
+				t.Errorf("run2() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_nomogramRow_countPossibleArrangementsBetter(t *testing.T) {
+	type fields struct {
+		spring string
+		groups []int
+	}
+	type args struct {
+		idx      int
+		groupIdx int
+		groupLen int
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   int
+	}{
+		{name: "sample1", fields: fields{spring: "???.###", groups: []int{1, 1, 3}}, args: args{idx: 0, groupIdx: 0, groupLen: 0}, want: 1},
+		{name: "sample2", fields: fields{spring: ".??..??...?##.", groups: []int{1, 1, 3}}, args: args{idx: 0, groupIdx: 0, groupLen: 0}, want: 4},
+		{name: "sample3", fields: fields{spring: "?#?#?#?#?#?#?#?", groups: []int{1, 3, 1, 6}}, args: args{idx: 0, groupIdx: 0, groupLen: 0}, want: 1},
+		{name: "sample4", fields: fields{spring: "????.#...#...", groups: []int{4, 1, 1}}, args: args{idx: 0, groupIdx: 0, groupLen: 0}, want: 1},
+		{name: "sample5", fields: fields{spring: "????.######..#####.", groups: []int{1, 6, 5}}, args: args{idx: 0, groupIdx: 0, groupLen: 0}, want: 4},
+		{name: "sample6", fields: fields{spring: "?###????????", groups: []int{3, 2, 1}}, args: args{idx: 0, groupIdx: 0, groupLen: 0}, want: 10},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			n := &nomogramRow{
+				spring: tt.fields.spring,
+				groups: tt.fields.groups,
+				cache:  make(map[[3]int]int),
+			}
+			if got := n.countPossibleArrangementsBetter(tt.args.idx, tt.args.groupIdx, tt.args.groupLen); got != tt.want {
+				t.Errorf("countPossibleArrangementsBetter() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_parseRowWithFolding(t *testing.T) {
+	type args struct {
+		line       string
+		foldFactor int
+	}
+	tests := []struct {
+		name string
+		args args
+		want nomogramRow
+	}{
+		{name: "sample", args: args{line: ".# 1", foldFactor: 5}, want: nomogramRow{spring: ".#?.#?.#?.#?.#", groups: []int{1, 1, 1, 1, 1}}},
+		{name: "sample", args: args{line: "???.### 1,1,3", foldFactor: 5}, want: nomogramRow{spring: "???.###????.###????.###????.###????.###", groups: []int{1, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1, 3}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := parseRowWithFolding(tt.args.line, tt.args.foldFactor); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("parseRowWithFolding() = %v, want %v", got, tt.want)
 			}
 		})
 	}
