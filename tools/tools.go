@@ -46,6 +46,10 @@ func PowInt(x, y int) int {
 	return int(math.Pow(float64(x), float64(y)))
 }
 
+func PowInt64(x, y int) int64 {
+	return int64(math.Pow(float64(x), float64(y)))
+}
+
 func AbsInt(i int) int {
 	return int(math.Abs(float64(i)))
 }
