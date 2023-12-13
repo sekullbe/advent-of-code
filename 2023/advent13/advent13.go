@@ -35,8 +35,48 @@ func run1(input string) int {
 }
 
 func run2(input string) int {
+	sum := 0
+	patterns := parsers.SplitByEmptyNewlineToSlices(input)
+	for _, pattern := range patterns {
+		mp, vertical := findMirrorPointWithSmudge(pattern)
+		if vertical {
+			sum += mp
+		} else {
+			sum += 100 * mp
+		}
 
-	return 0
+	}
+	return sum
+}
+
+func findMirrorPoint(pattern []string) (mp int, vertical bool) {
+
+	var found bool
+	mp, found = findSingleMirrorPoint(pattern)
+	if found {
+		return mp, true
+	}
+	mp, found = findSingleMirrorPoint(rotatePattern(pattern))
+	if !found {
+		panic("could not find a mirror in either direction")
+	}
+	return mp, false
+
+}
+
+func findSingleMirrorPoint(pattern []string) (int, bool) {
+	mps := []mapset.Set[int]{}
+	for _, row := range pattern {
+		mps = append(mps, mapset.NewSet[int](findMirrorPoints(row)...))
+	}
+	singlemp := mps[0].Clone()
+	for _, mp := range mps {
+		singlemp = singlemp.Intersect(mp)
+	}
+	if singlemp.Cardinality() == 1 {
+		return singlemp.Pop()
+	}
+	return 0, false
 }
 
 // finds the mirror points(mirroring between N and N+1 returns N) and returns  true if it exists
@@ -62,38 +102,6 @@ func findMirrorPoints(row string) []int {
 	return mps
 }
 
-func findMirrorPoint(pattern []string) (mp int, vertical bool) {
-
-	var found bool
-	mp, found = findSingleMirrorPoint(pattern)
-	if found {
-		return mp, true
-	}
-	mp, found = findSingleMirrorPoint(rotatePattern(pattern))
-	if !found {
-		panic("could not find a mirror in either direction")
-	}
-	return mp, false
-
-}
-
-func findSingleMirrorPoint(pattern []string) (int, bool) {
-
-	mps := []mapset.Set[int]{}
-	for _, row := range pattern {
-		mps = append(mps, mapset.NewSet[int](findMirrorPoints(row)...))
-	}
-	singlemp := mps[0].Clone()
-	for _, mp := range mps {
-		singlemp = singlemp.Intersect(mp)
-	}
-	if singlemp.Cardinality() == 1 {
-		return singlemp.Pop()
-	}
-	return 0, false
-
-}
-
 /*
 rotate 90deg CCW, so the top becomes the left
 we want to calculate cols from the left as rows from the top
@@ -116,4 +124,46 @@ func rotatePattern(pattern []string) []string {
 		out = append(out, row)
 	}
 	return out
+}
+
+func findSecondBestMirrorPoint(pattern []string) (mp int, ok bool) {
+	allRowMps := [][]int{}
+	for _, row := range pattern {
+		mps := findMirrorPoints(row)
+		allRowMps = append(allRowMps, mps)
+	}
+	return inAllButOne(allRowMps)
+}
+
+// finds an element that is in all the sets except one, if it exists
+// assumes that all the sets are the same size
+func inAllButOne(sets [][]int) (int, bool) {
+	howMany := make(map[int]int)
+	for _, set := range sets {
+		for _, i2 := range set {
+			howMany[i2]++
+		}
+	}
+	// find the second most common value- it'll be the one that was in n-1 sets
+	desiredValue := len(sets) - 1
+	for k, v := range howMany {
+		if v == desiredValue {
+			return k, true
+		}
+	}
+	return 0, false
+}
+
+func findMirrorPointWithSmudge(pattern []string) (mp int, vertical bool) {
+
+	var found bool
+	mp, found = findSecondBestMirrorPoint(pattern)
+	if found {
+		return mp, true
+	}
+	mp, found = findSecondBestMirrorPoint(rotatePattern(pattern))
+	if !found {
+		panic("could not find a mirror in either direction")
+	}
+	return mp, false
 }

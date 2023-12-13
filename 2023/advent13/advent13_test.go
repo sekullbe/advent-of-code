@@ -113,6 +113,7 @@ func Test_findMirrorPoint(t *testing.T) {
 		wantVertical bool
 	}{
 		{name: "sample1", args: args{pattern: parsers.SplitByLines(pattern1)}, wantMp: 5, wantVertical: true},
+		{name: "sample1r", args: args{pattern: rotatePattern(parsers.SplitByLines(pattern1))}, wantMp: 5, wantVertical: false},
 		{name: "sample2", args: args{pattern: parsers.SplitByLines(pattern2)}, wantMp: 4, wantVertical: false},
 	}
 	for _, tt := range tests {
@@ -123,6 +124,79 @@ func Test_findMirrorPoint(t *testing.T) {
 			}
 			if gotVertical != tt.wantVertical {
 				t.Errorf("findMirrorPoint() gotVertical = %v, want %v", gotVertical, tt.wantVertical)
+			}
+		})
+	}
+}
+
+func Test_inAllButOne(t *testing.T) {
+	type args struct {
+		sets [][]int
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  int
+		want1 bool
+	}{
+		{name: "2", args: args{sets: [][]int{{1, 2, 3}, {1, 2, 4}, {1, 2, 5}, {1, 6, 7}, {1, 2, 6}}}, want: 2, want1: true},
+		{name: "notfound", args: args{sets: [][]int{{1, 2, 3}, {1, 2, 4}, {1, 2, 5}, {1, 6, 7}, {1, 9, 6}}}, want: 0, want1: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := inAllButOne(tt.args.sets)
+			if got != tt.want {
+				t.Errorf("inAllButOne() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("inAllButOne() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}
+
+func Test_findSecondBestMirrorPoint(t *testing.T) {
+	type args struct {
+		pattern []string
+	}
+	tests := []struct {
+		name   string
+		args   args
+		wantMp int
+		wantOk bool
+	}{
+		{name: "sample1", args: args{pattern: parsers.SplitByLines(pattern1)}, wantMp: 0, wantOk: false},
+		{name: "sample1r", args: args{pattern: rotatePattern(parsers.SplitByLines(pattern1))}, wantMp: 3, wantOk: true},
+		{name: "sample2", args: args{pattern: rotatePattern(parsers.SplitByLines(pattern2))}, wantMp: 1, wantOk: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotMp, gotOk := findSecondBestMirrorPoint(tt.args.pattern)
+			if gotMp != tt.wantMp {
+				t.Errorf("findSecondBestMirrorPoint() gotMp = %v, want %v", gotMp, tt.wantMp)
+			}
+			if gotOk != tt.wantOk {
+				t.Errorf("findSecondBestMirrorPoint() gotOk = %v, want %v", gotOk, tt.wantOk)
+			}
+		})
+	}
+}
+
+func Test_run2(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "sample1", args: args{input: pattern1 + "\n\n" + pattern2}, want: 400},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := run2(tt.args.input); got != tt.want {
+				t.Errorf("run2() = %v, want %v", got, tt.want)
 			}
 		})
 	}
