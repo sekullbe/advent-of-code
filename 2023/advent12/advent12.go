@@ -30,8 +30,8 @@ func run1(input string) int {
 	for _, line := range parsers.SplitByLines(input) {
 		n := parseRow(line)
 		n.cache = make(map[[3]int]int)
-		sum += countPossibleArrangements(n)
-		//sum += n.countPossibleArrangementsBetter(0, 0, 0)
+		//sum += countPossibleArrangements(n)
+		sum += n.countPossibleArrangementsBetter(0, 0, 0)
 	}
 	return sum
 }
