@@ -40,6 +40,9 @@ type board struct {
 	grid
 	maxX, maxY int // min is always 0
 	northest   []int
+	southest   []int
+	westest    []int
+	eastest    []int
 }
 
 // generalized grid impl will provide this
@@ -107,23 +110,25 @@ func parseBoard(lines []string) *board {
 		maxX:     0,
 		maxY:     0,
 		northest: []int{},
+		southest: []int{},
+		eastest:  []int{},
+		westest:  []int{},
 	}
 	b := &bb
+	b.maxX = len(lines[0]) - 1
+	b.maxY = len(lines) - 1
 
 	for y, line := range lines {
 		if len(line) == 0 {
 			break // catch extraneous blank lines
 		}
-		b.northest = append(b.northest, -1)
-		b.maxY = max(b.maxY, y)
 		for x, r := range line {
-			b.maxX = max(b.maxX, x)
 			pt := Pt(x, y)
-
 			t := newTile(pt, parseRock(r))
 			b.grid[pt] = &t
 		}
 	}
+	b.resetEsts()
 	return b
 }
 
@@ -148,6 +153,7 @@ func (b *board) printBoard() {
 }
 
 func (b *board) fprintBoard(w io.Writer) {
+	//fmt.Fprintln(w, "-------------------")
 	for y := 0; y <= b.maxY; y++ {
 		for x := 0; x <= b.maxX; x++ {
 			switch b.At(x, y).rock {
@@ -191,6 +197,22 @@ func (b *board) moveRock(from, to Point) error {
 	b.grid[Pt(from.X, from.Y)].rock = SPACE
 	b.grid[Pt(to.X, to.Y)].rock = rock
 	return nil
+}
+
+func (b *board) resetEsts() {
+	b.northest = []int{}
+	b.southest = []int{}
+	b.westest = []int{}
+	b.eastest = []int{}
+	for x := 0; x <= b.maxX; x++ {
+		b.northest = append(b.northest, -1)
+		b.southest = append(b.southest, b.maxY+1)
+	}
+	for y := 0; y <= b.maxY; y++ {
+		b.westest = append(b.westest, -1)
+		b.eastest = append(b.eastest, b.maxX+1)
+	}
+
 }
 
 /*
