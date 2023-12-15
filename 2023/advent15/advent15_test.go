@@ -45,7 +45,7 @@ func Test_BytesWorkTheWayIThinkTheyDo(t *testing.T) {
 	assert.Equal(t, 72, i)
 }
 
-func Test_processStep(t *testing.T) {
+func Test_hash(t *testing.T) {
 	type args struct {
 		step string
 	}
@@ -69,7 +69,55 @@ func Test_processStep(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, processStep(tt.args.step), "processStep(%v)", tt.args.step)
+			assert.Equalf(t, tt.want, hash(tt.args.step), "hash(%v)", tt.args.step)
+		})
+	}
+}
+
+func Test_decodeStep(t *testing.T) {
+	type args struct {
+		step string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantLabel  string
+		wantBoxnum int
+		wantOp     string
+		wantFocal  int
+	}{
+		{name: "sample1", args: args{step: "rn=1"}, wantLabel: "rn", wantBoxnum: 0, wantOp: "=", wantFocal: 1},
+		{name: "sample2", args: args{step: "cm-"}, wantLabel: "cm", wantBoxnum: 0, wantOp: "-", wantFocal: 0},
+		{name: "sample3", args: args{step: "qp=3"}, wantLabel: "qp", wantBoxnum: 1, wantOp: "=", wantFocal: 3},
+		{name: "sample4", args: args{step: "cm=2"}, wantLabel: "cm", wantBoxnum: 0, wantOp: "=", wantFocal: 2},
+		{name: "sample5", args: args{step: "qp-"}, wantLabel: "qp", wantBoxnum: 1, wantOp: "-", wantFocal: 0},
+		{name: "sample6", args: args{step: "pc=4"}, wantLabel: "pc", wantBoxnum: 3, wantOp: "=", wantFocal: 4},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotLabel, gotBoxnum, gotOp, gotFocal := decodeStep(tt.args.step)
+			assert.Equalf(t, tt.wantLabel, gotLabel, "decodeStep(%v)", tt.args.step)
+			assert.Equalf(t, tt.wantBoxnum, gotBoxnum, "decodeStep(%v)", tt.args.step)
+			assert.Equalf(t, tt.wantOp, gotOp, "decodeStep(%v)", tt.args.step)
+			assert.Equalf(t, tt.wantFocal, gotFocal, "decodeStep(%v)", tt.args.step)
+		})
+	}
+}
+
+func Test_run2(t *testing.T) {
+	type args struct {
+		input string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "sample", args: args{input: sampleInput}, want: 145},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, run2(tt.args.input), "run2(%v)", tt.args.input)
 		})
 	}
 }
