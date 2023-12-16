@@ -50,11 +50,17 @@ type baseSquare struct {
 	Point Point
 }
 
+type cacheKey struct {
+	p   Point
+	dir int
+}
+
 // and a user will add something like this
 type tile struct {
 	baseSquare
-	contents int
-	dirs     mapset.Set[int]
+	contents      int
+	dirs          mapset.Set[int]
+	knownFromHere map[cacheKey]mapset.Set[Point]
 }
 
 func Pt(x, y int) Point {
@@ -85,9 +91,10 @@ func neighborInDirection(p Point, dir int) (neighbor Point) {
 
 func newTile(p Point, content int) tile {
 	return tile{
-		baseSquare: baseSquare{Point: p},
-		contents:   content,
-		dirs:       mapset.NewSet[int](),
+		baseSquare:    baseSquare{Point: p},
+		contents:      content,
+		dirs:          mapset.NewSet[int](),
+		knownFromHere: make(map[cacheKey]mapset.Set[Point]),
 	}
 }
 
@@ -198,6 +205,7 @@ func (b *board) fprintBoardEnergized(w io.Writer, energized mapset.Set[Point]) {
 		}
 		fmt.Fprintln(w)
 	}
+	fmt.Fprintln(w)
 }
 
 func ManhattanDistance(p1, p2 Point) int {

@@ -19,17 +19,49 @@ func main() {
 
 func run1(input string) int {
 	b := parseBoard(parsers.SplitByLines(input))
-	//b.printBoard()
-	fmt.Println()
-	energized := b.laser(Pt(0, 0), EAST)
-	//b.fprintBoardEnergized(os.Stdout, energized)
-	//fmt.Println()
+
+	//	energized := b.laser(Pt(0, 0), EAST)
+	//	return energized.Cardinality()
+
+	return b.laserAndCount(Pt(0, 0), EAST)
+}
+
+func (b *board) laserAndCount(p Point, dir int) int {
+	energized := b.laser(p, dir)
 	return energized.Cardinality()
 }
 
 func run2(input string) int {
 
-	return 0
+	eMax := 0
+	b := parseBoard(parsers.SplitByLines(input))
+	// I *expect* this will accelerate as it goes, as the cache kicks in
+	for x := 0; x <= b.maxX; x++ {
+		b := parseBoard(parsers.SplitByLines(input))
+		eMax = max(eMax, b.laserAndCount(Pt(x, 0), SOUTH))
+		fmt.Print(".")
+	}
+	fmt.Println()
+	for x := 0; x <= b.maxX; x++ {
+		b := parseBoard(parsers.SplitByLines(input))
+		eMax = max(eMax, b.laserAndCount(Pt(x, b.maxY), NORTH))
+		fmt.Print(".")
+	}
+	fmt.Println()
+	for y := 0; y <= b.maxY; y++ {
+		b := parseBoard(parsers.SplitByLines(input))
+		eMax = max(eMax, b.laserAndCount(Pt(0, y), EAST))
+		fmt.Print(".")
+	}
+	fmt.Println()
+	for y := 0; y <= b.maxY; y++ {
+		b := parseBoard(parsers.SplitByLines(input))
+		eMax = max(eMax, b.laserAndCount(Pt(b.maxX, y), WEST))
+		fmt.Print(".")
+	}
+
+	return eMax
+	// 7655 too low!
 }
 
 func (b *board) laser(p Point, dir int) mapset.Set[Point] {
@@ -42,37 +74,52 @@ func (b *board) laser(p Point, dir int) mapset.Set[Point] {
 	m := t.contents
 	e := mapset.NewSet(p)
 
+	// this caching isn't *quite* working, I think because it conflicts with the loop detection
+	// and doesn't do that right either.
+	// Either a separate cache of pt,dir to set or num would probably work, instead of setting the cache on the tile
+	// itself, but it's fast enough.
+	//if ee, ok := t.knownFromHere[cacheKey{p, dir}]; ok {
+	//	b.fprintBoardEnergized(os.Stdout, ee)
+	//	return ee.Union(e)
+	//}
+
 	if t.dirs.Contains(dir) {
 		return e // we already know what happens from here
 	}
-
 	t.dirs.Add(dir)
 	b.grid[p] = t // I don't think the helpers work here
+	var e2 mapset.Set[Point]
 	switch m {
 	case SPACE:
-		e2 := e.Union(b.laser(neighborInDirection(p, dir), dir))
-		return e2
+		e2 = e.Union(b.laser(neighborInDirection(p, dir), dir))
 	case MIRROR_LEFT:
 		newDir := mirrorLeft(dir)
-		return e.Union(b.laser(neighborInDirection(p, newDir), newDir))
+		e2 = e.Union(b.laser(neighborInDirection(p, newDir), newDir))
 	case MIRROR_RIGHT:
 		newDir := mirrorRight(dir)
-		return e.Union(b.laser(neighborInDirection(p, newDir), newDir))
+		e2 = e.Union(b.laser(neighborInDirection(p, newDir), newDir))
 	case SPLIT_VERT:
 		nd1, nd2 := split(SPLIT_VERT, dir)
 		if nd2 == 0 {
-			return e.Union(b.laser(neighborInDirection(p, nd1), nd1))
+			e2 = e.Union(b.laser(neighborInDirection(p, nd1), nd1))
+		} else {
+			e2 = e.Union(b.laser(neighborInDirection(p, nd1), nd1).Union(b.laser(neighborInDirection(p, nd2), nd2)))
 		}
-		return e.Union(b.laser(neighborInDirection(p, nd1), nd1).Union(b.laser(neighborInDirection(p, nd2), nd2)))
 	case SPLIT_HORIZ:
 		nd1, nd2 := split(SPLIT_HORIZ, dir)
 		if nd2 == 0 {
-			return e.Union(b.laser(neighborInDirection(p, nd1), nd1))
+			e2 = e.Union(b.laser(neighborInDirection(p, nd1), nd1))
+		} else {
+			e2 = e.Union(b.laser(neighborInDirection(p, nd1), nd1).Union(b.laser(neighborInDirection(p, nd2), nd2)))
 		}
-		return e.Union(b.laser(neighborInDirection(p, nd1), nd1).Union(b.laser(neighborInDirection(p, nd2), nd2)))
 	default:
 		panic("don't know what to do with this tile")
 	}
+	//t.knownFromHere[cacheKey{p: p, dir: dir}] = e2
+	//b.grid[p] = t // I don't think the helpers work here
+	//b.fprintBoardEnergized(os.Stdout, e2)
+
+	return e2
 }
 
 //return e.Union(b.laser(neighborInDirection(p, dir), dir).Union(b.laser(p,dir)))
