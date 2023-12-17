@@ -1,5 +1,3 @@
-github.com/adrianbrad/queue v1.3.0 h1:8FH1N+93HXbqta5+URa1AL+diV7MP3VDXAEnP+DNp48=
-github.com/adrianbrad/queue v1.3.0/go.mod h1:wYiPC/3MPbyT45QHLrPR4zcqJWPePubM1oEP/xTwhUs=
 github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482 h1:p4g4uok3+r6Tg6fxXEQUAcMAX/WdK6WhkQW9s0jaT7k=
 github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482/go.mod h1:Cu3t5VeqE8kXjUBeNXWQprfuaP5UCIc5ggGjgMx9KFc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -9,6 +7,8 @@ github.com/deckarep/golang-set/v2 v2.5.0 h1:hn6cEZtQ0h3J8kFrHR/NrzyOoTnjgW1+FmNJ
 github.com/deckarep/golang-set/v2 v2.5.0/go.mod h1:VAky9rY/yGXJOLEDv3OMci+7wtDpOF4IN+y82NBOac4=
 github.com/mxschmitt/golang-combinations v1.2.0 h1:V5E7MncIK8Yr1SL/SpdqMuSquFsfoIs5auI7Y3n8z14=
 github.com/mxschmitt/golang-combinations v1.2.0/go.mod h1:RCm5eR03B+JrBOMRDLsKZWShluXdrHu+qwhPEJ0miBM=
+github.com/oleiade/lane/v2 v2.0.0 h1:XW/ex/Inr+bPkLd3O240xrFOhUkTd4Wy176+Gv0E3Qw=
+github.com/oleiade/lane/v2 v2.0.0/go.mod h1:i5FBPFAYSWCgLh58UkUGCChjcCzef/MI7PlQm2TKCeg=
 github.com/oleiade/reflections v1.0.1 h1:D1XO3LVEYroYskEsoSiGItp9RUxG6jWnCVvrqH0HHQM=
 github.com/oleiade/reflections v1.0.1/go.mod h1:rdFxbxq4QXVZWj0F+e9jqjDkc7dbp97vkRixKo2JR60=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

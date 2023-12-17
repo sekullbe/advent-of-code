@@ -6,6 +6,7 @@ require (
 	github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482
 	github.com/deckarep/golang-set/v2 v2.5.0
 	github.com/mxschmitt/golang-combinations v1.2.0
+	github.com/oleiade/lane/v2 v2.0.0
 	github.com/oleiade/reflections v1.0.1
 	github.com/samber/lo v1.39.0
 	github.com/stretchr/testify v1.8.4
@@ -15,7 +16,6 @@ require (
 )
 
 require (
-	github.com/adrianbrad/queue v1.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
