@@ -30,11 +30,17 @@ func run1(input string) int {
 	// we still want our old friend the Grid
 	// those playing along at home will notice that it's shifted a bit more towards a real module
 	b := ParseBoard(parsers.SplitByLines(input))
-	cost := b.path(state{pt: Pt(0, 0), facing: -1, steps: 0})
+	cost := b.path(state{pt: Pt(0, 0), facing: -1, steps: 0}, 0, 3)
 	return cost
 }
 
-func (b *Board) path(startState state) int {
+func run2(input string) int {
+	b := ParseBoard(parsers.SplitByLines(input))
+	cost := b.path(state{pt: Pt(0, 0), facing: -1, steps: 0}, 4, 10)
+	return cost
+}
+
+func (b *Board) path(startState state, turnLimit int, straightLimit int) int {
 	pq := lane.NewMinPriorityQueue[state, int]()
 	pq.Push(startState, 0)
 	endPt := Pt(b.MaxX, b.MaxY)
@@ -44,7 +50,8 @@ func (b *Board) path(startState state) int {
 	for !pq.Empty() {
 		st, pri, _ := pq.Pop() // pri == cost
 
-		if st.pt == endPt { // hooray we're done
+		// read carefully! must satisfy turn restriction *before it can stop at the end*!
+		if st.pt == endPt && st.steps >= turnLimit { // hooray we're done
 			return pri
 		}
 		// have we been here before?
@@ -63,20 +70,25 @@ func (b *Board) path(startState state) int {
 				})
 			}
 		} else {
-			// turn left
-			possibleNextStates = append(possibleNextStates, state{
-				pt:     NeigborInDirection(st.pt, CounterClockwise(st.facing, 2)),
-				facing: CounterClockwise(st.facing, 2),
-				steps:  1,
-			})
-			// turn right
-			possibleNextStates = append(possibleNextStates, state{
-				pt:     NeigborInDirection(st.pt, Clockwise(st.facing, 2)),
-				facing: Clockwise(st.facing, 2),
-				steps:  1,
-			})
+			canTurn := st.steps >= turnLimit
+			canStraight := st.steps < straightLimit
+
+			if canTurn {
+				// turn left
+				possibleNextStates = append(possibleNextStates, state{
+					pt:     NeigborInDirection(st.pt, CounterClockwise(st.facing, 2)),
+					facing: CounterClockwise(st.facing, 2),
+					steps:  1,
+				})
+				// turn right
+				possibleNextStates = append(possibleNextStates, state{
+					pt:     NeigborInDirection(st.pt, Clockwise(st.facing, 2)),
+					facing: Clockwise(st.facing, 2),
+					steps:  1,
+				})
+			}
 			// go straight if we can
-			if st.steps < 3 {
+			if canStraight {
 				possibleNextStates = append(possibleNextStates, state{
 					pt:     NeigborInDirection(st.pt, st.facing),
 					facing: st.facing,
@@ -92,9 +104,4 @@ func (b *Board) path(startState state) int {
 
 	}
 	panic("no solution")
-}
-
-func run2(input string) int {
-
-	return 0
 }
