@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482
+	github.com/ctessum/geom v0.2.12
 	github.com/deckarep/golang-set/v2 v2.5.0
 	github.com/mxschmitt/golang-combinations v1.2.0
 	github.com/oleiade/lane/v2 v2.0.0
@@ -16,7 +17,11 @@ require (
 )
 
 require (
+	github.com/ctessum/polyclip-go v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/gonum/floats v0.0.0-20181209220543-c233463c7e82 // indirect
+	github.com/gonum/internal v0.0.0-20181124074243-f884aa714029 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	gonum.org/v1/gonum v0.9.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

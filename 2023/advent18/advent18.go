@@ -3,9 +3,12 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/ctessum/geom"
 	"github.com/sekullbe/advent/parsers"
+	"github.com/sekullbe/advent/tools"
 	"image"
 	"image/color"
+	"strconv"
 )
 
 //go:embed input.txt
@@ -111,7 +114,93 @@ func parseDirection(d string) int {
 
 func run2(input string) int {
 
-	// betcha we use that color thing here
+	// I can actually do this without a grid
+	// start at 0,0 and add points to the polygon as we go
+	// iterate over all the points
+	// if an edge is right or up it is inside, left or down it is outside, so count trenches and insides separately
 
-	return 0
+	diggerLoc := Pt(0, 0)
+	var minX, minY, maxX, maxY int
+	outsideDigs := 0
+
+	polygonPoints := []image.Point{diggerLoc}
+	for _, line := range parsers.SplitByLines(input) {
+		dir, dist := parsePart2Instruction(line)
+		diggerLoc = newPoint(diggerLoc, dir, dist)
+		maxX = max(diggerLoc.X, maxX)
+		maxY = max(diggerLoc.Y, maxY)
+		minX = min(diggerLoc.X, minX) // not sure if we go negative, but let's handle it just in case
+		minY = min(diggerLoc.Y, minY)
+		polygonPoints = append(polygonPoints, diggerLoc)
+		// if it's left or down, add the length to outsideDigs
+		if dir == LEFT || dir == DOWN {
+			outsideDigs += dist
+		}
+	}
+
+	// this is a much faster algorithm
+	gpts := []geom.Point{}
+	for _, ipt := range polygonPoints {
+		gpts = append(gpts, geom.Point{float64(ipt.X), float64(ipt.Y)})
+	}
+	gpoly := geom.Polygon{gpts}
+	return int(gpoly.Area()) + outsideDigs + 1
+
+	/*
+		// eh... this is going to take months
+			pf := NewPolyfence(polygonPoints)
+			inside := 0
+			for x := minX; x <= maxX; x++ {
+				fmt.Printf(".")
+				for y := minY; y <= maxY; y++ {
+					if pf.Inside(Pt(x, y)) {
+						inside += 1
+					}
+				}
+			}
+			return inside + outsideDigs
+	*/
+
+}
+
+func parsePart2Instruction(line string) (dir, dist int) {
+
+	var xdir string
+	var xdist int
+	var hex string
+	n, err := fmt.Sscanf(line, "%s %d %s", &xdir, &xdist, &hex)
+	if n != 3 || err != nil {
+		panic("can't parse " + line)
+	}
+	hexdist := hex[2:7]
+	hexdir := string(hex[7])
+	dist = int(tools.Must(strconv.ParseInt(hexdist, 16, 0)))
+	switch hexdir {
+	case "0":
+		dir = RIGHT
+	case "1":
+		dir = DOWN
+	case "2":
+		dir = LEFT
+	case "3":
+		dir = UP
+	default:
+		panic("bad dir")
+	}
+	return dir, dist
+}
+
+func newPoint(p image.Point, dir int, dist int) image.Point {
+
+	switch dir {
+	case UP:
+		return p.Add(Pt(0, -dist))
+	case RIGHT:
+		return p.Add(Pt(dist, 0))
+	case DOWN:
+		return p.Add(Pt(0, dist))
+	case LEFT:
+		return p.Add(Pt(-dist, 0))
+	}
+	return p
 }
