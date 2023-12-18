@@ -37,7 +37,7 @@ func Test_run1(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := run1(tt.args.input); got != tt.want {
+			if got := run1better(tt.args.input); got != tt.want {
 				t.Errorf("run1() = %v, want %v", got, tt.want)
 			}
 		})

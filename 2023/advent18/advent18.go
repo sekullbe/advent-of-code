@@ -16,6 +16,7 @@ var inputText string
 
 func main() {
 	fmt.Printf("Magic number: %d\n", run1(inputText))
+	fmt.Printf("Magic number: %d\n", run1better(inputText))
 	fmt.Println("-------------")
 	fmt.Printf("Magic number: %d\n", run2(inputText))
 }
@@ -203,4 +204,49 @@ func newPoint(p image.Point, dir int, dist int) image.Point {
 		return p.Add(Pt(-dist, 0))
 	}
 	return p
+}
+
+func run1better(input string) int {
+
+	// I can actually do this without a grid
+	// start at 0,0 and add points to the polygon as we go
+	// iterate over all the points
+	// if an edge is right or up it is inside, left or down it is outside, so count trenches and insides separately
+
+	diggerLoc := Pt(0, 0)
+	var minX, minY, maxX, maxY int
+	outsideDigs := 0
+
+	polygonPoints := []image.Point{diggerLoc}
+	for _, line := range parsers.SplitByLines(input) {
+		dir, dist := parsePart1Instruction(line)
+		diggerLoc = newPoint(diggerLoc, dir, dist)
+		maxX = max(diggerLoc.X, maxX)
+		maxY = max(diggerLoc.Y, maxY)
+		minX = min(diggerLoc.X, minX) // not sure if we go negative, but let's handle it just in case
+		minY = min(diggerLoc.Y, minY)
+		polygonPoints = append(polygonPoints, diggerLoc)
+		// if it's left or down, add the length to outsideDigs
+		if dir == LEFT || dir == DOWN {
+			outsideDigs += dist
+		}
+	}
+
+	// this is a much faster algorithm
+	gpts := []geom.Point{}
+	for _, ipt := range polygonPoints {
+		gpts = append(gpts, geom.Point{float64(ipt.X), float64(ipt.Y)})
+	}
+	gpoly := geom.Polygon{gpts}
+	return int(gpoly.Area()) + outsideDigs + 1
+}
+
+func parsePart1Instruction(line string) (dir, dist int) {
+
+	var ds, hex string
+	n, err := fmt.Sscanf(line, "%s %d %s", &ds, &dist, &hex)
+	if n != 3 || err != nil {
+		panic("can't parse " + line)
+	}
+	return parseDirection(ds), dist
 }
