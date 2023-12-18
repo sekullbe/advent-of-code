@@ -43,6 +43,11 @@ func TestSplitByLines(t *testing.T) {
 			args: args{str: "foo\nbar\nbaz"},
 			want: []string{"foo", "bar", "baz"},
 		},
+		{
+			name: "leading and trailing newline",
+			args: args{str: "\nfoo\nbar\nbaz\n"},
+			want: []string{"foo", "bar", "baz"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
