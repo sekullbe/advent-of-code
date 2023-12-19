@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/sekullbe/advent/parsers"
 	"github.com/sekullbe/advent/tools"
+	"maps"
 	"regexp"
 	"strings"
 )
@@ -31,6 +32,7 @@ type workflow struct {
 }
 
 type part map[string]int
+type workflows map[string]workflow
 
 func run1(input string) int {
 
@@ -59,7 +61,113 @@ func run1(input string) int {
 
 func run2(input string) int {
 
-	return 0
+	// can I look through every rule and find all of the states that lead to A?
+	/*
+				s < 1351 && a >= 2006 && m>2090
+			    hdj && m <=838 && a<=1716
+			    hdj && m > 838
+		...
+		reverse that, starting at "in" continue with recursive DFS and keep all the ranges that got you there
+		at each step, keep "true" and remove "false" ranges from the set starting at 1..4000
+		when you hit A, count the ranges (low*high for each rating x-m-a-s)
+		when you hit R, return 0; all those ranges were invalid
+	*/
+
+	workflows, _ := parseInput(input)
+	ranges := map[string]rng{"x": {1, 4000}, "m": {1, 4000}, "a": {1, 4000}, "s": {1, 4000}}
+	total := countValidRanges(ranges, "in", workflows)
+
+	return total
+}
+
+type rng struct {
+	low, high int
+}
+
+func countValidRanges(ranges map[string]rng, wfn string, wfs workflows) int {
+	// reimplementation of https://github.com/derailed-dash/Advent-of-Code/blob/master/src/AoC_2023/Dazbo's_Advent_of_Code_2023.ipynb algorithm
+	if wfn == "R" {
+		return 0
+	}
+	if wfn == "A" {
+		// multiply accepted ranges - ie there are x*m*a*s ways to hit this accepted state
+		prod := 1
+		for _, r := range ranges {
+			prod *= r.high - r.low + 1
+		}
+		return prod
+	}
+
+	w := wfs[wfn]
+	total := 0
+	for _, r := range w.rules {
+
+		// are we at a terminal rule?
+		if r.rating == "" {
+			total += countValidRanges(ranges, r.next, wfs)
+		} else {
+			curRng := ranges[r.rating]
+			// find the ranges for the rule's rating where the rule is true or false
+			var trueRng, falseRng rng
+			// ok I'll grant this switch could be two lines of python :)
+			switch r.operator {
+			case "<":
+				trueRng.low = curRng.low
+				trueRng.high = r.operand - 1
+				falseRng.low = r.operand
+				falseRng.high = curRng.high
+			case ">":
+				trueRng.low = r.operand + 1
+				trueRng.high = curRng.high
+				falseRng.low = curRng.low
+				falseRng.high = r.operand
+			default:
+				panic("bad operator")
+			}
+			// if the ranges are impossible, don't go to the next workflow or next rule in this workflow
+			if trueRng.low <= trueRng.high {
+
+				rangeCopy := maps.Clone(ranges)
+				rangeCopy[r.rating] = trueRng
+				total += countValidRanges(rangeCopy, r.next, wfs)
+			}
+			if falseRng.low <= falseRng.high {
+				ranges[r.rating] = falseRng
+			} else {
+				// can't continue this workflow
+				break
+			}
+		}
+	}
+	return total
+}
+
+// do it the long way to see if _enough_ brute force works
+// on the sample data, this takes about 4s per "m" so 4*4000*4000 = a hecking long time
+func run2stupid(input string) int {
+	workflows, _ := parseInput(input)
+	accepted := 0
+	for x := 1; x <= 4000; x++ {
+		fmt.Print("x")
+		for m := 1; m <= 4000; m++ {
+			fmt.Print("m")
+			for a := 1; a <= 4000; a++ {
+				for s := 1; s <= 4000; s++ {
+					p := part{"x": x, "m": m, "a": a, "s": s}
+					next := "in"
+					for next != "A" && next != "R" {
+						w := workflows[next]
+						next = processWorkflowStep(w, p)
+						if next == "A" {
+							accepted++
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return accepted
 }
 
 func parseInput(input string) (map[string]workflow, []part) {
