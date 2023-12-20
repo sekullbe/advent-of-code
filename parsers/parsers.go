@@ -74,3 +74,7 @@ func SplitByLines(str string) []string {
 func SplitByLinesNoTrim(str string) []string {
 	return strings.Split(str, "\n")
 }
+
+func SplitByCommasAndTrim(str string) []string {
+	return strings.Split(strings.ReplaceAll(str, " ", ""), ",")
+}
