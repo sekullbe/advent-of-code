@@ -221,7 +221,15 @@ type noop struct {
 
 func (n *noop) pulse(sender string, pulse bool) (nextPulses []queuedPulse) {
 	n.inc(pulse)
-	return []queuedPulse{}
+	if pulse == LOW && n.name == "rx" {
+		return []queuedPulse{{
+			sourceName: "rx",
+			level:      LOW,
+			target:     "rx",
+		}}
+	} else {
+		return []queuedPulse{}
+	}
 }
 
 func printPulse(p bool) string {
