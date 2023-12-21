@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"github.com/sekullbe/advent/parsers"
+	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 )
@@ -84,4 +85,48 @@ func TestCounterClockwise(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestBoard_AtPointWrapped(t *testing.T) {
+	b := ParseBoard(parsers.SplitByLines(sample))
+	//b.printBoard()
+	assert.Equal(t, '#', b.AtPointWrapped(Pt(5, 12)).Contents)
+	assert.Equal(t, '#', b.AtPointWrapped(Pt(5, -2)).Contents)
+	assert.Equal(t, '#', b.AtPointWrapped(Pt(5, -13)).Contents)
+	assert.Equal(t, '#', b.AtPointWrapped(Pt(5, 9)).Contents)
+	assert.Equal(t, '#', b.AtPoint(Pt(5, 9)).Contents)
+	assert.Equal(t, '.', b.AtPoint(Pt(5, 5)).Contents)
+	assert.Equal(t, '#', b.AtPoint(Pt(5, 6)).Contents)
+	assert.Equal(t, '.', b.AtPoint(Pt(5, 8)).Contents)
+	assert.Equal(t, '.', b.AtPointWrapped(Pt(5, 8)).Contents)
+	assert.Equal(t, '.', b.AtPointWrapped(Pt(5, -3)).Contents)
+
+	for y := 0; y < 100; y++ {
+		for x := 0; x < 100; x++ {
+			assert.Equal(t, b.AtPoint(Pt(x%11, y%11)), b.AtPointWrapped(Pt(x, y)))
+		}
+
+	}
+}
+
+func TestBoard_GetSquareNeighborsNoChecks(t *testing.T) {
+	b := ParseBoard(parsers.SplitByLines(sample))
+	ns := b.GetSquareNeighborsNoChecks(Pt(10000, -10000))
+	assert.Equal(t, 4, len(ns))
+
+}
+
+func Test_wrapmod(t *testing.T) {
+
+	assert.Equal(t, 63, wrapmod(-1, 64))
+	assert.Equal(t, 1, wrapmod(-63, 64))
+	assert.Equal(t, 0, wrapmod(-64, 64))
+	assert.Equal(t, 63, wrapmod(-65, 64))
+	assert.Equal(t, 0, wrapmod(-128, 64))
+	assert.Equal(t, 63, wrapmod(-129, 64))
+	assert.Equal(t, 0, wrapmod(0, 64))
+	assert.Equal(t, 1, wrapmod(1, 64))
+	assert.Equal(t, 1, wrapmod(65, 64))
+	assert.Equal(t, 1, wrapmod(129, 64))
+
 }

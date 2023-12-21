@@ -161,6 +161,15 @@ func (b Board) GetSquareNeighbors(p image.Point) []image.Point {
 	return ns
 }
 
+func (b Board) GetSquareNeighborsNoChecks(p image.Point) []image.Point {
+	ns := []image.Point{}
+	for d := NORTH; d <= WEST; d += 2 {
+		np := NeighborInDirection(p, d)
+		ns = append(ns, np)
+	}
+	return ns
+}
+
 func (b *Board) printBoard() {
 	b.FprintBoard(os.Stdout)
 }
@@ -187,6 +196,11 @@ func ManhattanDistance(p1, p2 image.Point) int {
 func (b *Board) AtPoint(p image.Point) *Tile {
 	return b.Grid[p]
 }
+func (b *Board) AtPointWrapped(p image.Point) *Tile {
+	np := Pt(wrapmod(p.X, b.MaxX+1), wrapmod(p.Y, b.MaxX+1))
+	return b.Grid[np]
+}
+
 func (b *Board) At(x, y int) *Tile {
 	return b.Grid[Pt(x, y)]
 }
@@ -201,4 +215,8 @@ func CounterClockwise(dir int, ticks int) int {
 
 func ValidDir(dir int) bool {
 	return dir >= NORTH && dir <= NORTHWEST
+}
+
+func wrapmod(a, b int) int {
+	return (a%b + b) % b
 }
