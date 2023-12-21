@@ -9,10 +9,6 @@ const (
 	LOW  = false
 	HIGH = true
 )
-const (
-	OFF = false
-	ON  = true
-)
 
 type queuedPulse struct {
 	sourceName string
@@ -21,7 +17,6 @@ type queuedPulse struct {
 }
 
 type pulser interface {
-	// input the queuedPulse - the pulser needs to send who it is for conjunctions to work
 	pulse(sender string, pulse bool) []queuedPulse
 	setOutgoing([]pulser) // []pulser?
 	setOutgoingNames([]string)
@@ -44,11 +39,11 @@ type module struct {
 	lows, highs   int
 }
 
-func (m *module) getLows() int {
+func (m module) getLows() int {
 	return m.lows
 }
 
-func (m *module) getHighs() int {
+func (m module) getHighs() int {
 	return m.highs
 }
 
@@ -60,7 +55,7 @@ func (m *module) incHigh() {
 	m.highs++
 }
 
-func (m *module) getName() string {
+func (m module) getName() string {
 	return m.name
 }
 func (m *module) inc(pl bool) {
@@ -80,13 +75,13 @@ func (m *module) addOutgoing(p pulser) {
 func (m *module) setOutgoingNames(ns []string) {
 	m.outgoingNames = ns
 }
-func (m *module) getOutgoingNames() []string {
+func (m module) getOutgoingNames() []string {
 	return m.outgoingNames
 }
 
 // these only really apply to Conjunctions
 
-func (m *module) addIncoming(s string) {
+func (m module) addIncoming(s string) {
 }
 func (c *conjunction) addIncoming(s string) {
 	c.state[s] = LOW

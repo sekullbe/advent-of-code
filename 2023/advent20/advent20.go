@@ -51,7 +51,7 @@ func run2(input string) int {
 		so find the cycles of each of those, or at least the first press count where they go high
 
 		This isn't quite a general solution, but the puzzle is specific enough in supplying four cycles that all
-		feed rs that it wouldn't be very general anyway.
+		feed rs that it wouldn't be very general anyway. And I hardcoded the magic modules instead of passing them in.
 	*/
 	magic := make(map[string]int)
 	for {
@@ -71,7 +71,7 @@ func run2(input string) int {
 }
 
 // given a queue, pop and queuedPulse, adding any new pulses to the queue
-// not sure what to return yet
+// return 0, or part 2's magic number if it's looking for that (it's been told to count presses by sending presses > 0)
 func runPulses(pulsers map[string]pulser, magic map[string]int, queue *lane.Queue[queuedPulse], presses int) int {
 
 	for {
@@ -79,9 +79,8 @@ func runPulses(pulsers map[string]pulser, magic map[string]int, queue *lane.Queu
 		if ok {
 			nextPulses := pulsers[nextPulse.target].pulse(nextPulse.sourceName, nextPulse.level)
 			for _, np := range nextPulses {
-				// announce if it's one of the magic ones
+				// handle if it's one of the magic ones
 				if presses > 0 && np.level == HIGH && (np.sourceName == "bt" || np.sourceName == "dl" || np.sourceName == "rv" || np.sourceName == "fr") {
-					//fmt.Printf("Magic conjunction %s low\n", np.sourceName)
 					if _, ok := magic[np.sourceName]; !ok {
 						magic[np.sourceName] = presses
 						fmt.Printf("Magic conjunction %s high at press %d\n", np.sourceName, presses)
