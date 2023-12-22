@@ -1,0 +1,68 @@
+package geometry
+
+// int version of "gopkg.in/karalabe/cookiejar.v2/geometry"
+// also doesn't use pointers
+
+import (
+	"github.com/sekullbe/advent/tools"
+	"math"
+)
+
+// Two dimensional point.
+type Point2 struct {
+	X, Y int
+}
+
+// Three dimensional point.
+type Point3 struct {
+	X, Y, Z int
+}
+
+// Allocates and returns a new 2D point.
+func NewPoint2(x, y int) Point2 {
+	return Point2{x, y}
+}
+
+// Allocates and returns a new 3D point.
+func NewPoint3(x, y, z int) Point3 {
+	return Point3{x, y, z}
+}
+
+// Calculates the distance between x and y.
+func (x Point2) Dist(y Point2) float64 {
+	return math.Sqrt(float64(x.DistSqr(y)))
+}
+
+// Calculates the distance between x and y.
+func (x Point3) Dist(y Point3) float64 {
+	return math.Sqrt(float64(x.DistSqr(y)))
+}
+
+// Calculates the squared distance between x and y.
+func (x Point2) DistSqr(y Point2) int {
+	dx := x.X - y.X
+	dy := x.Y - y.Y
+	return dx*dx + dy*dy
+}
+
+// Calculates the squared distance between x and y.
+func (x Point3) DistSqr(y Point3) int {
+	dx := x.X - y.X
+	dy := x.Y - y.Y
+	dz := x.Z - y.Z
+	return dx*dx + dy*dy + dz*dz
+}
+
+// Returns whether two points are equal.
+func (x Point2) Equal(y Point2) bool {
+	return tools.AbsInt(x.X-y.X) == 0 && tools.AbsInt(x.Y-y.Y) == 0
+}
+
+// Returns whether two points are equal.
+func (x Point3) Equal(y Point3) bool {
+	return tools.AbsInt(x.X-y.X) == 0 && tools.AbsInt(x.Y-y.Y) == 0 && tools.AbsInt(x.Z-y.Z) == 0
+}
+
+func (p Point3) MovePoint3(dx, dy, dz int) Point3 {
+	return NewPoint3(p.X+dx, p.Y+dy, p.Z+dz)
+}
