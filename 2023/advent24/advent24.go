@@ -51,6 +51,8 @@ func run1(input string, minCoord, maxCoord int) int {
 }
 
 func run2(input string) int {
+	// so there's some line that at some T intersects every single hailstone
+	// it'll have to be identical to the loc of some stone at that time,
 
 	return 0
 }
