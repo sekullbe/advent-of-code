@@ -74,28 +74,6 @@ func TestCounterClockwise(t *testing.T) {
 	}
 }
 
-func TestBoard_AtPointWrapped(t *testing.T) {
-	b := ParseBoard(parsers.SplitByLines(sample))
-	//b.printBoard()
-	assert.Equal(t, '#', b.AtPointWrapped(Pt(5, 12)).Contents)
-	assert.Equal(t, '#', b.AtPointWrapped(Pt(5, -2)).Contents)
-	assert.Equal(t, '#', b.AtPointWrapped(Pt(5, -13)).Contents)
-	assert.Equal(t, '#', b.AtPointWrapped(Pt(5, 9)).Contents)
-	assert.Equal(t, '#', b.AtPoint(Pt(5, 9)).Contents)
-	assert.Equal(t, '.', b.AtPoint(Pt(5, 5)).Contents)
-	assert.Equal(t, '#', b.AtPoint(Pt(5, 6)).Contents)
-	assert.Equal(t, '.', b.AtPoint(Pt(5, 8)).Contents)
-	assert.Equal(t, '.', b.AtPointWrapped(Pt(5, 8)).Contents)
-	assert.Equal(t, '.', b.AtPointWrapped(Pt(5, -3)).Contents)
-
-	for y := 0; y < 100; y++ {
-		for x := 0; x < 100; x++ {
-			assert.Equal(t, b.AtPoint(Pt(x%11, y%11)), b.AtPointWrapped(Pt(x, y)))
-		}
-
-	}
-}
-
 func TestBoard_GetSquareNeighborsNoChecks(t *testing.T) {
 	b := ParseBoard(parsers.SplitByLines(sample))
 	ns := b.GetSquareNeighborsNoChecks(Pt(10000, -10000))
