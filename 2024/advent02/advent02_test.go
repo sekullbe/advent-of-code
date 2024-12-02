@@ -38,7 +38,7 @@ func Test_run2(t *testing.T) {
 		args args
 		want int
 	}{
-		// TODO: Add test cases.
+		{name: "sampletext", args: args{input: sampleText}, want: 4},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -117,6 +117,34 @@ func Test_testDiff(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := testDiff(tt.args.s, tt.args.min, tt.args.max); got != tt.want {
 				t.Errorf("testDiff() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_generateDampenedReports(t *testing.T) {
+	type args struct {
+		r []int
+	}
+	tests := []struct {
+		name string
+		args args
+		want [][]int
+	}{
+		{name: "inc3", args: args{r: []int{1, 4, 7, 10, 13}},
+			want: [][]int{
+				{4, 7, 10, 13},
+				{1, 7, 10, 13},
+				{1, 4, 10, 13},
+				{1, 4, 7, 13},
+				{1, 4, 7, 10},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := generateDampenedReports(tt.args.r); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("generateDampenedReports() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -185,6 +185,7 @@ func Triangular(n int) (triangle int) {
 }
 
 // these do no bounds checking. TODO make them return error
+// Or use slices.* equivalents
 func InsertElt[T any](array []T, value T, index int) []T {
 	return append(array[:index], append([]T{value}, array[index:]...)...)
 }
