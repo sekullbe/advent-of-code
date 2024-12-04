@@ -5,6 +5,7 @@ package grid
 
 import (
 	"fmt"
+	"github.com/sekullbe/advent/parsers"
 	"github.com/sekullbe/advent/tools"
 	"image"
 	"io"
@@ -41,7 +42,6 @@ type BaseTile struct {
 	Point image.Point
 }
 
-// and a user will add this
 type Tile struct {
 	BaseTile
 	Contents rune
@@ -78,6 +78,10 @@ func NewTile(p image.Point, content rune) Tile {
 		BaseTile: BaseTile{Point: p},
 		Contents: content,
 	}
+}
+
+func ParseBoardString(fullBoard string) *Board {
+	return ParseBoard(parsers.SplitByLines(fullBoard))
 }
 
 func ParseBoard(lines []string) *Board {
@@ -133,17 +137,20 @@ func (b *Board) InRange(pt image.Point) bool {
 	return pt.X >= 0 && pt.X <= b.MaxX && pt.Y >= 0 && pt.Y <= b.MaxY
 }
 
-// generalized implementation here would take a function and use that
-// or I could produce an iterator of neighbors - see https://bitfieldconsulting.com/golang/iterators
-func (b *Board) checkNeighborsForSymbol(p image.Point) {
+// look in all directions around p and return the list of directions in which the symbol was found
+func (b *Board) CheckNeighborsForSymbol(p image.Point, symbol rune) []int {
+	observedDirections := []int{}
 	for dir := NORTH; dir <= NORTHWEST; dir++ { // kind of gross that this depends on the order of the constants
 		dp := neighborInDirection(p, dir)
 		n, ok := b.Grid[dp]
-		_ = n
-		_ = ok
+		if ok && n.Contents == symbol {
+			observedDirections = append(observedDirections, dir)
+		}
 	}
+	return observedDirections
 }
 
+// get onboard neighbors in square directions- no diagonals.
 func (b Board) GetSquareNeighbors(p image.Point) []image.Point {
 	ns := []image.Point{}
 	for d := NORTH; d <= WEST; d += 2 {
@@ -155,6 +162,7 @@ func (b Board) GetSquareNeighbors(p image.Point) []image.Point {
 	return ns
 }
 
+// Doesn't check to see if a point is offboard
 func (b Board) GetSquareNeighborsNoChecks(p image.Point) []image.Point {
 	ns := []image.Point{}
 	for d := NORTH; d <= WEST; d += 2 {
@@ -190,6 +198,8 @@ func ManhattanDistance(p1, p2 image.Point) int {
 func (b *Board) AtPoint(p image.Point) *Tile {
 	return b.Grid[p]
 }
+
+// if this point is offboard, wrap until it's onboard
 func (b *Board) AtPointWrapped(p image.Point) *Tile {
 	np := Pt(wrapmod(p.X, b.MaxX+1), wrapmod(p.Y, b.MaxX+1))
 	return b.Grid[np]
@@ -224,5 +234,5 @@ func isNumber(r rune) bool {
 }
 
 func isBlank(r rune) bool {
-	return r == EMPTY
+	return r == EMPTY || r == ' '
 }
