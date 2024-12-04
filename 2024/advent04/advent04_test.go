@@ -43,7 +43,7 @@ func Test_run2(t *testing.T) {
 		args args
 		want int
 	}{
-		// TODO: Add test cases.
+		{name: "sampletext", args: args{input: sampleText}, want: 9},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

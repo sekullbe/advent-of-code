@@ -42,5 +42,22 @@ func run1(input string) int {
 
 func run2(input string) int {
 
-	return 0
+	// read it into a grid
+	b := grid.ParseBoardString(input)
+	matches := 0
+	for point, tile := range b.Grid { // remember that the grid will be checked in arbitrary order because we're iterating a map!
+		if tile.Contents == 'A' {
+			couldBeMAS := 0
+			// check all 4 directions for M and S
+			for d := grid.NORTHEAST; d <= grid.NORTHWEST; d += 2 {
+				if b.AtPoint(grid.NeighborInDirection(point, d)).Contents == 'M' && b.AtPoint(grid.NeighborInDirection(point, grid.Opposite(d))).Contents == 'S' {
+					couldBeMAS++
+				}
+			}
+			if couldBeMAS >= 2 {
+				matches++
+			}
+		}
+	}
+	return matches
 }

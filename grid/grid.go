@@ -47,6 +47,7 @@ type Tile struct {
 	Contents rune
 }
 
+// these two maybe belong in geometry package?
 func Pt(x, y int) image.Point {
 	return image.Point{X: x, Y: y}
 }
@@ -195,7 +196,12 @@ func ManhattanDistance(p1, p2 image.Point) int {
 	return tools.AbsInt(p1.X-p2.X) + tools.AbsInt(p1.Y-p2.Y)
 }
 
+// should it return an error or a tile guaranteed to match nothing?
 func (b *Board) AtPoint(p image.Point) *Tile {
+	if !b.InRange(p) {
+		t := NewTile(p, EMPTY)
+		return &t
+	}
 	return b.Grid[p]
 }
 
@@ -215,6 +221,10 @@ func Clockwise(dir int, ticks int) int {
 
 func CounterClockwise(dir int, ticks int) int {
 	return (dir + (8 - ticks)) % 8
+}
+
+func Opposite(dir int) int {
+	return Clockwise(dir, 4)
 }
 
 func ValidDir(dir int) bool {
