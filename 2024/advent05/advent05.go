@@ -56,6 +56,7 @@ func run2(input string) int {
 			if !testRuleWithRegex(r, u) { // only look at the failures
 				// fix it by swapping the numbers in place
 				//fmt.Printf("Fixing %s for rule %d|%d: ", u, r.before, r.after)
+				// This would break very badly if some numbers were substrings of others.
 				u = fixUpdate(r, u)
 				//fmt.Println(u)
 				fixed = true

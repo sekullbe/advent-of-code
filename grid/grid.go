@@ -5,9 +5,9 @@ package grid
 
 import (
 	"fmt"
+	"github.com/sekullbe/advent/geometry"
 	"github.com/sekullbe/advent/parsers"
 	"github.com/sekullbe/advent/tools"
-	"image"
 	"io"
 	"os"
 )
@@ -34,47 +34,27 @@ type Board struct {
 
 // working towards a generalized Grid implementation with generic contents and a parser
 // have to think about what the interface would be
-type Grid map[image.Point]*Tile
+type Grid map[geometry.Point]*Tile
 
-// generalized Grid impl will provide this
 type BaseTile struct {
 	Id    int
-	Point image.Point
+	Point geometry.Point
 }
 
 type Tile struct {
 	BaseTile
 	Contents rune
+	// these two are used often enough, but this really out to be somehow generic
+	Counter   int
+	Traversed bool
 }
 
-// these two maybe belong in geometry package?
-func Pt(x, y int) image.Point {
-	return image.Point{X: x, Y: y}
+// maybe this belongs in geometry package
+func Pt(x, y int) geometry.Point {
+	return geometry.Point{X: x, Y: y}
 }
 
-func neighborInDirection(p image.Point, dir int) (neighbor image.Point) {
-	switch dir {
-	case NORTH:
-		return Pt(p.X, p.Y-1)
-	case NORTHEAST:
-		return Pt(p.X+1, p.Y-1)
-	case EAST:
-		return Pt(p.X+1, p.Y)
-	case SOUTHEAST:
-		return Pt(p.X+1, p.Y+1)
-	case SOUTH:
-		return Pt(p.X, p.Y+1)
-	case SOUTHWEST:
-		return Pt(p.X-1, p.Y+1)
-	case WEST:
-		return Pt(p.X-1, p.Y)
-	case NORTHWEST:
-		return Pt(p.X-1, p.Y-1)
-	}
-	return
-}
-
-func NewTile(p image.Point, content rune) Tile {
+func NewTile(p geometry.Point, content rune) Tile {
 	return Tile{
 		BaseTile: BaseTile{Point: p},
 		Contents: content,
@@ -111,7 +91,7 @@ func ParseBoard(lines []string) *Board {
 	return b
 }
 
-func NeighborInDirection(p image.Point, dir int) (neighbor image.Point) {
+func NeighborInDirection(p geometry.Point, dir int) (neighbor geometry.Point) {
 	switch dir % 8 {
 	case NORTH:
 		return Pt(p.X, p.Y-1)
@@ -134,15 +114,15 @@ func NeighborInDirection(p image.Point, dir int) (neighbor image.Point) {
 	}
 
 }
-func (b *Board) InRange(pt image.Point) bool {
+func (b *Board) InRange(pt geometry.Point) bool {
 	return pt.X >= 0 && pt.X <= b.MaxX && pt.Y >= 0 && pt.Y <= b.MaxY
 }
 
 // look in all directions around p and return the list of directions in which the symbol was found
-func (b *Board) CheckNeighborsForSymbol(p image.Point, symbol rune) []int {
+func (b *Board) CheckNeighborsForSymbol(p geometry.Point, symbol rune) []int {
 	observedDirections := []int{}
 	for dir := NORTH; dir <= NORTHWEST; dir++ { // kind of gross that this depends on the order of the constants
-		dp := neighborInDirection(p, dir)
+		dp := NeighborInDirection(p, dir)
 		n, ok := b.Grid[dp]
 		if ok && n.Contents == symbol {
 			observedDirections = append(observedDirections, dir)
@@ -152,8 +132,8 @@ func (b *Board) CheckNeighborsForSymbol(p image.Point, symbol rune) []int {
 }
 
 // get onboard neighbors in square directions- no diagonals.
-func (b Board) GetSquareNeighbors(p image.Point) []image.Point {
-	ns := []image.Point{}
+func (b Board) GetSquareNeighbors(p geometry.Point) []geometry.Point {
+	ns := []geometry.Point{}
 	for d := NORTH; d <= WEST; d += 2 {
 		np := NeighborInDirection(p, d)
 		if b.InRange(np) {
@@ -164,8 +144,8 @@ func (b Board) GetSquareNeighbors(p image.Point) []image.Point {
 }
 
 // Doesn't check to see if a point is offboard
-func (b Board) GetSquareNeighborsNoChecks(p image.Point) []image.Point {
-	ns := []image.Point{}
+func (b Board) GetSquareNeighborsNoChecks(p geometry.Point) []geometry.Point {
+	ns := []geometry.Point{}
 	for d := NORTH; d <= WEST; d += 2 {
 		np := NeighborInDirection(p, d)
 		ns = append(ns, np)
@@ -192,12 +172,12 @@ func (b *Board) FprintBoard(w io.Writer) {
 	}
 }
 
-func ManhattanDistance(p1, p2 image.Point) int {
+func ManhattanDistance(p1, p2 geometry.Point) int {
 	return tools.AbsInt(p1.X-p2.X) + tools.AbsInt(p1.Y-p2.Y)
 }
 
 // should it return an error or a tile guaranteed to match nothing?
-func (b *Board) AtPoint(p image.Point) *Tile {
+func (b *Board) AtPoint(p geometry.Point) *Tile {
 	if !b.InRange(p) {
 		t := NewTile(p, EMPTY)
 		return &t
@@ -206,7 +186,7 @@ func (b *Board) AtPoint(p image.Point) *Tile {
 }
 
 // if this point is offboard, wrap until it's onboard
-func (b *Board) AtPointWrapped(p image.Point) *Tile {
+func (b *Board) AtPointWrapped(p geometry.Point) *Tile {
 	np := Pt(wrapmod(p.X, b.MaxX+1), wrapmod(p.Y, b.MaxX+1))
 	return b.Grid[np]
 }
@@ -235,14 +215,14 @@ func wrapmod(a, b int) int {
 	return (a%b + b) % b
 }
 
-func isSymbol(r rune) bool {
-	return !(isBlank(r) || isNumber(r))
+func IsSymbol(r rune) bool {
+	return !(IsBlank(r) || IsNumber(r))
 }
 
-func isNumber(r rune) bool {
+func IsNumber(r rune) bool {
 	return r >= '0' && r <= '9'
 }
 
-func isBlank(r rune) bool {
+func IsBlank(r rune) bool {
 	return r == EMPTY || r == ' '
 }

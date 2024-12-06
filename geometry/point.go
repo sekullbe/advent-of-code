@@ -12,6 +12,7 @@ import (
 type Point2 struct {
 	X, Y int
 }
+type Point Point2
 
 // Three dimensional point.
 type Point3 struct {
