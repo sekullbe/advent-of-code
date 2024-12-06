@@ -54,6 +54,7 @@ func run1(input string) int {
 
 func run2(input string) int {
 
+	// what can I track such that I know the guard has just completed a loop
 	b := grid.ParseBoard(parsers.SplitByLines(input))
 
 	// find the guard
@@ -83,11 +84,9 @@ func run2(input string) int {
 		guard = initialGuard
 		guardFacing = initialGuardFacing
 		if newObstacleTile.Point == initialGuard || !grid.IsBlank(newObstacleTile.Contents) {
-			continue // invalid place to put obstacle
+			continue // invalid place to put obstale
 		}
 		b.Grid[newObstacleTile.Point].Contents = '#' // can't just assign to newObstacleTile
-		// for debugging
-		//b.Grid[grid.Pt(3, 6)].Contents = '#'
 		clear(visits)
 		for b.InRange(guard) {
 			next := grid.NeighborInDirection(guard, guardFacing)
