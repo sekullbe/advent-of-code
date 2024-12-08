@@ -44,7 +44,7 @@ type BaseTile struct {
 type Tile struct {
 	BaseTile
 	Contents rune
-	// these two are used often enough, but this really out to be somehow generic
+	// these two are used often enough, but this really ought to be somehow generic
 	Counter   int
 	Traversed bool
 }
@@ -224,5 +224,5 @@ func IsNumber(r rune) bool {
 }
 
 func IsBlank(r rune) bool {
-	return r == EMPTY || r == ' '
+	return r == EMPTY || r == ' ' || r == 0 // uninitialized == empty
 }

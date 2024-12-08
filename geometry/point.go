@@ -12,7 +12,7 @@ import (
 type Point2 struct {
 	X, Y int
 }
-type Point Point2
+type Point = Point2
 
 // Three dimensional point.
 type Point3 struct {
@@ -64,6 +64,15 @@ func (x Point3) Equal(y Point3) bool {
 	return tools.AbsInt(x.X-y.X) == 0 && tools.AbsInt(x.Y-y.Y) == 0 && tools.AbsInt(x.Z-y.Z) == 0
 }
 
+func (p Point2) MovePoint2(dx, dy int) Point2 {
+	return NewPoint2(p.X+dx, p.Y+dy)
+}
+
 func (p Point3) MovePoint3(dx, dy, dz int) Point3 {
 	return NewPoint3(p.X+dx, p.Y+dy, p.Z+dz)
+}
+
+// offset is what you have to add to A to get to B
+func CalculateOffsets(a, b Point2) (x, y int) {
+	return b.X - a.X, b.Y - a.Y
 }
