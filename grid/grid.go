@@ -32,8 +32,9 @@ type Board struct {
 	startX, startY int
 }
 
-// working towards a generalized Grid implementation with generic contents and a parser
+// working towards a generic Grid implementation with generic contents and a parser
 // have to think about what the interface would be
+// probably woud have methods on Tile so a grid[T] would contain anything implementing something like 'Tiler'
 type Grid map[geometry.Point]*Tile
 
 type BaseTile struct {
@@ -44,6 +45,7 @@ type BaseTile struct {
 type Tile struct {
 	BaseTile
 	Contents rune
+	Value    int // we store numbers often enough
 	// these two are used often enough, but this really ought to be somehow generic
 	Counter   int
 	Traversed bool
@@ -58,6 +60,7 @@ func NewTile(p geometry.Point, content rune) Tile {
 	return Tile{
 		BaseTile: BaseTile{Point: p},
 		Contents: content,
+		Value:    int(content - '0'),
 	}
 }
 
