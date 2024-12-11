@@ -259,3 +259,26 @@ func LCM(a, b int, integers ...int) int {
 func LCM_slice(integers ...int) int {
 	return LCM(integers[0], integers[1], integers[2:]...)
 }
+
+// from https://stackoverflow.com/questions/25686109/split-string-by-length-in-golang
+func ChunkString(s string, chunkSize int) []string {
+	if len(s) == 0 {
+		return nil
+	}
+	if chunkSize >= len(s) {
+		return []string{s}
+	}
+	var chunks []string = make([]string, 0, (len(s)-1)/chunkSize+1)
+	currentLen := 0
+	currentStart := 0
+	for i := range s {
+		if currentLen == chunkSize {
+			chunks = append(chunks, s[currentStart:i])
+			currentLen = 0
+			currentStart = i
+		}
+		currentLen++
+	}
+	chunks = append(chunks, s[currentStart:])
+	return chunks
+}

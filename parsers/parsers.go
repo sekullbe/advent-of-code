@@ -8,6 +8,7 @@ import (
 
 // TODO Many of the things here can be done with fmt.Fscanf, fmt.Sscan, etc.
 
+// process all ints to a slice, separated by any whitespace including newline
 func StringsToIntSlice(inputText string) []int {
 	dataSetStr := strings.Fields(inputText)
 	var dataSet []int
