@@ -83,27 +83,23 @@ func scoreOneStone(stone int, iterations int) int {
 	if iterations == 0 {
 		return 1
 	}
-	score := 0
-	for i := 0; i < iterations; i++ {
-		if cacheScore, ok := stoneScores[stoneAndCount{stone, iterations}]; ok {
-			cacheHits += 1
-			return cacheScore
-		}
-		cacheMisses += 1
-		newstones := blink([]int{stone})
-		if len(newstones) == 1 {
-			ns := scoreOneStone(newstones[0], iterations-1)
-			stoneScores[stoneAndCount{newstones[0], iterations - 1}] = ns
-			return ns
-		} else {
-			ns0 := scoreOneStone(newstones[0], iterations-1)
-			stoneScores[stoneAndCount{newstones[0], iterations - 1}] = ns0
-			ns1 := scoreOneStone(newstones[1], iterations-1)
-			stoneScores[stoneAndCount{newstones[1], iterations - 1}] = ns1
-			return ns0 + ns1
-		}
+	if cacheScore, ok := stoneScores[stoneAndCount{stone, iterations}]; ok {
+		cacheHits += 1
+		return cacheScore
 	}
-	return score
+	cacheMisses += 1
+	newstones := blink([]int{stone})
+	if len(newstones) == 1 {
+		ns := scoreOneStone(newstones[0], iterations-1)
+		stoneScores[stoneAndCount{newstones[0], iterations - 1}] = ns
+		return ns
+	} else {
+		ns0 := scoreOneStone(newstones[0], iterations-1)
+		stoneScores[stoneAndCount{newstones[0], iterations - 1}] = ns0
+		ns1 := scoreOneStone(newstones[1], iterations-1)
+		stoneScores[stoneAndCount{newstones[1], iterations - 1}] = ns1
+		return ns0 + ns1
+	}
 }
 
 func blink(stones []int) []int {
