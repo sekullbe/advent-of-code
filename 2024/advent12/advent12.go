@@ -55,7 +55,28 @@ func run1(input string) int {
 
 func run2(input string) int {
 
-	return 0
+	b := grid.ParseBoard(parsers.SplitByLines(input))
+	regions := []region{}
+	processedPoints := make(map[geometry.Point]bool)
+
+	for point, _ := range b.Grid {
+		if _, seen := processedPoints[point]; !seen {
+			r := floodfillMatchingLetter(b, point)
+			regions = append(regions, r)
+			for g := range r {
+				processedPoints[g] = true
+			}
+		}
+	}
+	totalScore := 0
+	for _, r := range regions {
+		area := len(r)
+		sides := computeSidesOfRegion(b, r)
+		totalScore += area * sides
+
+		//log.Printf("Region: area %d sides %d, score=%d", area, sides, area*sides)
+	}
+	return totalScore
 }
 
 func floodfillMatchingLetter(b *grid.Board, start geometry.Point) region {
@@ -79,4 +100,37 @@ func floodFillFind(b *grid.Board, start geometry.Point, region region) {
 			floodFillFind(b, n, region)
 		}
 	}
+}
+
+func computeSidesOfRegion(b *grid.Board, r region) int {
+
+	// a region has the same number of sides as corners
+	// for each tile look N&E,S&E,S&W,N&W
+	// eg N&E
+	// tile is a corner if N != T && E != T --OR-- N=T && E=T && NE != T
+	/*
+	  These are both corners, looking northeast
+	   ?A?	   ?XA
+	   ?XA	   ?XX
+	  Not a corner looking northeast, because the edge continues to another tile
+	   ?A?  ?X?
+	   ?XX  ?XA
+	*/
+	corners := 0
+	for point, _ := range r {
+		tile := b.AtPoint(point)
+		letter := tile.Contents
+		for _, direction := range grid.FourDirections {
+			t1 := b.AtPoint(grid.NeighborInDirection(point, direction))                    //eg N
+			td := b.AtPoint(grid.NeighborInDirection(point, grid.Clockwise(direction, 1))) // eg NE
+			t2 := b.AtPoint(grid.NeighborInDirection(point, grid.Clockwise(direction, 2))) // eg E
+			// could simplify but i'll probably need to look at this in debugger
+			corner := (t1.Contents != letter && t2.Contents != letter) || (t1.Contents == letter && t2.Contents == letter && td.Contents != letter)
+			if corner {
+				corners++
+			}
+		}
+
+	}
+	return corners
 }

@@ -23,6 +23,8 @@ const (
 	NORTHWEST
 )
 
+var FourDirections = [...]int{NORTH, EAST, SOUTH, WEST}
+
 // tile contents
 const EMPTY = '.'
 
