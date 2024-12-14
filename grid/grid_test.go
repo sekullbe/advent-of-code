@@ -32,7 +32,7 @@ func Test_isSymbol(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isSymbol(tt.args.r); got != tt.want {
+			if got := IsSymbol(tt.args.r); got != tt.want {
 				t.Errorf("isSymbol() = %v, want %v", got, tt.want)
 			}
 		})

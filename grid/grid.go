@@ -158,7 +158,7 @@ func (b Board) GetSquareNeighborsNoChecks(p geometry.Point) []geometry.Point {
 	return ns
 }
 
-func (b *Board) printBoard() {
+func (b *Board) PrintBoard() {
 	b.FprintBoard(os.Stdout)
 }
 
@@ -166,11 +166,16 @@ func (b *Board) FprintBoard(w io.Writer) {
 	for y := 0; y <= b.MaxY; y++ {
 		for x := 0; x <= b.MaxX; x++ {
 			t := b.At(x, y)
-			switch t.Contents {
-			case EMPTY:
-				fmt.Fprint(w, "·")
-			default:
-				fmt.Fprintf(w, "%c", t.Contents)
+			if t == nil {
+				fmt.Fprint(w, "·"+
+					"")
+			} else {
+				switch t.Contents {
+				case EMPTY:
+					fmt.Fprint(w, "·")
+				default:
+					fmt.Fprintf(w, "%c", t.Contents)
+				}
 			}
 		}
 		fmt.Fprintln(w)
@@ -192,11 +197,16 @@ func (b *Board) AtPoint(p geometry.Point) *Tile {
 
 // if this point is offboard, wrap until it's onboard
 func (b *Board) AtPointWrapped(p geometry.Point) *Tile {
-	np := Pt(wrapmod(p.X, b.MaxX+1), wrapmod(p.Y, b.MaxX+1))
+	np := Pt(wrapmod(p.X, b.MaxX+1), wrapmod(p.Y, b.MaxY+1))
 	return b.Grid[np]
 }
 
 func (b *Board) At(x, y int) *Tile {
+	p := geometry.NewPoint2(x, y)
+	if !b.InRange(p) {
+		t := NewTile(p, EMPTY)
+		return &t
+	}
 	return b.Grid[Pt(x, y)]
 }
 
