@@ -23,6 +23,9 @@ const (
 	NORTHWEST
 )
 
+// common directional instructions
+var DirRunes = map[rune]int{'^': NORTH, '>': EAST, 'v': SOUTH, 'V': SOUTH, '<': WEST}
+
 var FourDirections = [...]int{NORTH, EAST, SOUTH, WEST}
 
 // tile contents
@@ -51,6 +54,7 @@ type Tile struct {
 	// these two are used often enough, but this really ought to be somehow generic
 	Counter   int
 	Traversed bool
+	Offboard  bool
 }
 
 // maybe this belongs in geometry package
@@ -190,6 +194,7 @@ func ManhattanDistance(p1, p2 geometry.Point) int {
 func (b *Board) AtPoint(p geometry.Point) *Tile {
 	if !b.InRange(p) {
 		t := NewTile(p, EMPTY)
+		t.Offboard = true
 		return &t
 	}
 	return b.Grid[p]
@@ -205,9 +210,29 @@ func (b *Board) At(x, y int) *Tile {
 	p := geometry.NewPoint2(x, y)
 	if !b.InRange(p) {
 		t := NewTile(p, EMPTY)
+		t.Offboard = true
 		return &t
 	}
 	return b.Grid[Pt(x, y)]
+}
+
+// move the contents of the tile at point p in direction dir, only if the target tile is not empty
+// return true if move was successful
+func (b *Board) SlideTile(p geometry.Point, dir int) bool {
+	t := b.AtPoint(p)
+	if IsEmpty(t.Contents) {
+		return true // moving nothing is a successful no-op
+	}
+	nt := b.AtPoint(NeighborInDirection(p, dir))
+	if !b.InRange(nt.Point) {
+		return false // can't move offboard
+	}
+	if !IsEmpty(nt.Contents) {
+		return false // something is already there
+	}
+	nt.Contents = t.Contents
+	t.Contents = EMPTY
+	return true
 }
 
 func Clockwise(dir int, ticks int) int {
@@ -240,4 +265,8 @@ func IsNumber(r rune) bool {
 
 func IsBlank(r rune) bool {
 	return r == EMPTY || r == ' ' || r == 0 // uninitialized == empty
+}
+
+func IsEmpty(r rune) bool {
+	return IsBlank(r)
 }

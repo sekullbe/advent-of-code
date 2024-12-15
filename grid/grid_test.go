@@ -2,6 +2,7 @@ package grid
 
 import (
 	"bytes"
+	"github.com/sekullbe/advent/geometry"
 	"github.com/sekullbe/advent/parsers"
 	"strings"
 	"testing"
@@ -124,5 +125,22 @@ func Test_wrapmod(t *testing.T) {
 	assert.Equal(t, 1, wrapmod(1, 64))
 	assert.Equal(t, 1, wrapmod(65, 64))
 	assert.Equal(t, 1, wrapmod(129, 64))
+
+}
+
+func TestBoard_SlideTile(t *testing.T) {
+
+	b := ParseBoardString(`X.`)
+	moved := b.SlideTile(geometry.NewPoint2(0, 0), EAST)
+	ot := b.At(0, 0)
+	nt := b.At(1, 0)
+	assert.True(t, moved)
+	assert.Equal(t, EMPTY, ot.Contents)
+	assert.Equal(t, 'X', nt.Contents)
+
+	moved = b.SlideTile(geometry.NewPoint2(1, 0), EAST)
+	assert.False(t, moved)
+	assert.Equal(t, EMPTY, ot.Contents)
+	assert.Equal(t, 'X', nt.Contents)
 
 }
