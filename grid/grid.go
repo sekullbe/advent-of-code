@@ -4,6 +4,7 @@ package grid
 // but the dream continues.
 
 import (
+	"errors"
 	"fmt"
 	"github.com/sekullbe/advent/geometry"
 	"github.com/sekullbe/advent/parsers"
@@ -34,12 +35,13 @@ const EMPTY = '.'
 type Board struct {
 	Grid
 	MaxX, MaxY     int // min is always 0
-	startX, startY int
+	StartX, StartY int
+	Dir            int // commonly we're tracking this so throw it in
 }
 
 // working towards a generic Grid implementation with generic contents and a parser
 // have to think about what the interface would be
-// probably woud have methods on Tile so a grid[T] would contain anything implementing something like 'Tiler'
+// probably would have methods on Tile so a grid[T] would contain anything implementing something like 'Tiler'
 type Grid map[geometry.Point]*Tile
 
 type BaseTile struct {
@@ -233,6 +235,15 @@ func (b *Board) SlideTile(p geometry.Point, dir int) bool {
 	nt.Contents = t.Contents
 	t.Contents = EMPTY
 	return true
+}
+
+func (b *Board) Find(char rune) (geometry.Point2, error) {
+	for point, tile := range b.Grid {
+		if tile.Contents == char {
+			return point, nil
+		}
+	}
+	return Pt(-1, -1), errors.New("not found")
 }
 
 func Clockwise(dir int, ticks int) int {

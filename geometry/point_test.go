@@ -350,3 +350,35 @@ func TestPoint2_MovePoint2WithWrap(t *testing.T) {
 		})
 	}
 }
+
+func TestPoint2_Add(t *testing.T) {
+	type fields struct {
+		X int
+		Y int
+	}
+	type args struct {
+		q Point2
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Point2
+	}{
+		{name: "simple0", fields: fields{1, 1}, args: args{Point2{1, 1}}, want: Point2{X: 2, Y: 2}},
+		{name: "simple1", fields: fields{1, 1}, args: args{Point2{2, 1}}, want: Point2{X: 3, Y: 2}},
+		{name: "simple2", fields: fields{1, 1}, args: args{Point2{0, 5}}, want: Point2{X: 1, Y: 6}},
+		{name: "simple-2", fields: fields{1, 1}, args: args{Point2{-2, -2}}, want: Point2{X: -1, Y: -1}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := Point2{
+				X: tt.fields.X,
+				Y: tt.fields.Y,
+			}
+			if got := p.Add(tt.args.q); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Add() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

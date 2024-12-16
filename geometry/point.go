@@ -64,6 +64,10 @@ func (x Point3) Equal(y Point3) bool {
 	return tools.AbsInt(x.X-y.X) == 0 && tools.AbsInt(x.Y-y.Y) == 0 && tools.AbsInt(x.Z-y.Z) == 0
 }
 
+func (p Point2) Add(q Point2) Point2 {
+	return Point2{p.X + q.X, p.Y + q.Y}
+}
+
 func (p Point2) MovePoint2(dx, dy int) Point2 {
 	return NewPoint2(p.X+dx, p.Y+dy)
 }
