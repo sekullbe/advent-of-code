@@ -6,6 +6,7 @@ import (
 	"math"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 type AnyInt interface {
@@ -77,6 +78,15 @@ func MaxInt(a, b int) int {
 	} else {
 		return b
 	}
+}
+
+func IntArrayToString(a []int) string {
+	out := []string{}
+	for _, i := range a {
+		out = append(out, strconv.Itoa(i))
+	}
+	return strings.Join(out, ",")
+
 }
 
 // Generic tools, from https://bitfieldconsulting.com/golang/functional
