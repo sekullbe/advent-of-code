@@ -3,6 +3,7 @@ module github.com/sekullbe/advent
 go 1.23.3
 
 require (
+	github.com/Jcowwell/go-algorithm-club v0.0.0-20220301144310-f6cfca9526c5
 	github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482
 	github.com/ctessum/geom v0.2.12
 	github.com/deckarep/golang-set/v2 v2.5.0
@@ -11,7 +12,7 @@ require (
 	github.com/oleiade/lane/v2 v2.0.0
 	github.com/oleiade/reflections v1.0.1
 	github.com/samber/lo v1.39.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/twpayne/go-geom v1.5.3
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869
 	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb
@@ -23,7 +24,10 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gonum/floats v0.0.0-20181209220543-c233463c7e82 // indirect
 	github.com/gonum/internal v0.0.0-20181124074243-f884aa714029 // indirect
+	github.com/kr/pretty v0.1.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gonum.org/v1/gonum v0.9.3 // indirect
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

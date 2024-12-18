@@ -31,12 +31,14 @@ var FourDirections = [...]int{NORTH, EAST, SOUTH, WEST}
 
 // tile contents
 const EMPTY = '.'
+const WALL = '#'
 
 type Board struct {
 	Grid
 	MaxX, MaxY     int // min is always 0
 	StartX, StartY int
 	Dir            int // commonly we're tracking this so throw it in
+	pfReady        bool
 }
 
 // working towards a generic Grid implementation with generic contents and a parser
@@ -47,6 +49,7 @@ type Grid map[geometry.Point]*Tile
 type BaseTile struct {
 	Id    int
 	Point geometry.Point
+	Board *Board
 }
 
 type Tile struct {
@@ -280,4 +283,8 @@ func IsBlank(r rune) bool {
 
 func IsEmpty(r rune) bool {
 	return IsBlank(r)
+}
+
+func IsWall(r rune) bool {
+	return r == WALL
 }
