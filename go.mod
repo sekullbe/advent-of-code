@@ -3,7 +3,6 @@ module github.com/sekullbe/advent
 go 1.23.3
 
 require (
-	github.com/Jcowwell/go-algorithm-club v0.0.0-20220301144310-f6cfca9526c5
 	github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482
 	github.com/ctessum/geom v0.2.12
 	github.com/deckarep/golang-set/v2 v2.5.0

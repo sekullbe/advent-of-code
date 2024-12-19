@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type AnyInt interface {
@@ -86,7 +87,10 @@ func IntArrayToString(a []int) string {
 		out = append(out, strconv.Itoa(i))
 	}
 	return strings.Join(out, ",")
+}
 
+func Track(start time.Time, msg string) {
+	log.Printf("%v: %v\n", msg, time.Since(start))
 }
 
 // Generic tools, from https://bitfieldconsulting.com/golang/functional

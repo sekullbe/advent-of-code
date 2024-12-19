@@ -3,6 +3,8 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/sekullbe/advent/tools"
+	"time"
 )
 
 //go:embed input.txt
@@ -15,11 +17,12 @@ func main() {
 }
 
 func run1(input string) int {
-
+	defer tools.Track(time.Now(), "Part 1 Time")
 	return 0
 }
 
 func run2(input string) int {
+	defer tools.Track(time.Now(), "Part 2 Time:")
 
 	return 0
 }
