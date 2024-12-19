@@ -14,7 +14,7 @@ var inputText string
 func main() {
 	fmt.Printf("Magic number: %d\n", run1(inputText))
 	fmt.Println("-------------")
-	fmt.Printf("Magic number: %d\n", run2(inputText))
+	fmt.Printf("Magic number: %v\n", run2(inputText))
 }
 
 func run1(input string) int {
@@ -34,9 +34,22 @@ func run1(input string) int {
 	return steps
 }
 
-func run2(input string) int {
+func run2(input string) geometry.Point2 {
+	b := initBoard(70, 70)
+	bytes := parseBytes(parsers.SplitByLines(input))
+	dropBytes(b, bytes[:1024]) // bytes 0-1023
 
-	return 0
+	for _, pt := range bytes[1024:] {
+		t := b.AtPoint(pt)
+		t.Contents = grid.WALL
+		_, _, found := b.FindPath(grid.Pt(0, 0), grid.Pt(70, 70))
+		if found {
+			continue
+		}
+		return pt
+	}
+
+	return grid.Pt(-1, -1)
 }
 
 func initBoard(maxX, maxY int) *grid.Board {
@@ -68,7 +81,6 @@ func parseBytes(lines []string) []geometry.Point2 {
 func dropBytes(b *grid.Board, bytes []geometry.Point2) {
 	for _, pt := range bytes {
 		t := b.AtPoint(pt)
-		t.Contents = '#'
-		//b.Grid[pt]=t
+		t.Contents = grid.WALL
 	}
 }
