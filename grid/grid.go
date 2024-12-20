@@ -249,6 +249,16 @@ func (b *Board) Find(char rune) (geometry.Point2, error) {
 	return Pt(-1, -1), errors.New("not found")
 }
 
+func (b *Board) FindAll(char rune, excludeEdgeWall bool) []geometry.Point2 {
+	points := []geometry.Point2{}
+	for point, tile := range b.Grid {
+		if tile.Contents == char && (!excludeEdgeWall || !b.PointIsEdgeWall(point)) {
+			points = append(points, point)
+		}
+	}
+	return points
+}
+
 func Clockwise(dir int, ticks int) int {
 	return (dir + ticks) % 8
 }
@@ -287,4 +297,8 @@ func IsEmpty(r rune) bool {
 
 func IsWall(r rune) bool {
 	return r == WALL
+}
+
+func (b *Board) PointIsEdgeWall(pt geometry.Point) bool {
+	return IsWall(b.AtPoint(pt).Contents) && pt.X == 0 || pt.Y == 0 || pt.X == b.MaxX || pt.Y == b.MaxY
 }
