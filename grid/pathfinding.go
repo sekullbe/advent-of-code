@@ -3,6 +3,7 @@ package grid
 import (
 	"github.com/beefsack/go-astar"
 	"github.com/sekullbe/advent/geometry"
+	"github.com/sekullbe/advent/tools"
 )
 
 // kind of a gross kludge, but if I change algorithm later I can
@@ -45,6 +46,6 @@ func (b *Board) FindPath(from, to geometry.Point2) ([]geometry.Point2, int, bool
 	for i, pather := range path {
 		pathPts[i] = pather.(*Tile).Point
 	}
-	return pathPts, int(distance), found
+	return tools.Reverse(pathPts), int(distance), found
 
 }
