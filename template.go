@@ -22,7 +22,7 @@ func run1(input string) int {
 }
 
 func run2(input string) int {
-	defer tools.Track(time.Now(), "Part 2 Time:")
+	defer tools.Track(time.Now(), "Part 2 Time")
 
 	return 0
 }

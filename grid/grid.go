@@ -26,6 +26,7 @@ const (
 
 // common directional instructions
 var DirRunes = map[rune]int{'^': NORTH, '>': EAST, 'v': SOUTH, 'V': SOUTH, '<': WEST}
+var DirRunesBack = map[int]rune{NORTH: '^', EAST: '>', SOUTH: 'v', WEST: '<'}
 
 var FourDirections = [...]int{NORTH, EAST, SOUTH, WEST}
 
@@ -93,7 +94,7 @@ func ParseBoard(lines []string) *Board {
 		}
 		b.MaxY = max(b.MaxY, y)
 		for x, tc := range line {
-			b.MaxX = max(b.MaxY, x)
+			b.MaxX = max(b.MaxX, x)
 			if tc == ' ' {
 				continue
 			}
@@ -301,4 +302,40 @@ func IsWall(r rune) bool {
 
 func (b *Board) PointIsEdgeWall(pt geometry.Point) bool {
 	return IsWall(b.AtPoint(pt).Contents) && pt.X == 0 || pt.Y == 0 || pt.X == b.MaxX || pt.Y == b.MaxY
+}
+
+func PathToSteps(path []geometry.Point2) []rune {
+	steps := make([]rune, len(path)-1)
+	for i := 1; i < len(path); i++ {
+		dir := DirFromTo(path[i-1], path[i])
+		steps[i-1] = DirRunesBack[dir]
+	}
+	return steps
+}
+
+func DirFromTo(from, to geometry.Point2) int {
+	if from == to {
+		return -1
+	}
+	if to.X < from.X {
+		if to.Y < from.Y {
+			return NORTHWEST
+		}
+		if to.Y == from.Y {
+			return WEST
+		}
+		return SOUTHWEST
+	} else if to.X == from.X {
+		if to.Y < from.Y {
+			return NORTH
+		}
+		return SOUTH
+	}
+	if to.Y > from.Y {
+		return SOUTHEAST
+	}
+	if to.Y == from.Y {
+		return EAST
+	}
+	return NORTHEAST
 }
