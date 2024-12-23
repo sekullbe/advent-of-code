@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	graph "github.com/Tom-Johnston/mamba/graph"
 	mapset "github.com/deckarep/golang-set/v2"
 	combos "github.com/mxschmitt/golang-combinations"
 	"github.com/sekullbe/advent/parsers"
@@ -18,7 +19,7 @@ var inputText string
 func main() {
 	fmt.Printf("Magic number: %d\n", run1(inputText))
 	fmt.Println("-------------")
-	fmt.Printf("Magic number: %d\n", run2(inputText))
+	fmt.Printf("Magic password: %s\n", run2(inputText))
 }
 
 /*
@@ -53,10 +54,52 @@ func run1(input string) int {
 	return len(triangles)
 }
 
-func run2(input string) int {
+// this is called maximal clique and it's np-complete, oh joy
+func run2(input string) string {
 	defer tools.Track(time.Now(), "Part 2 Time")
+	lines := parsers.SplitByLines(input)
+	n := createNetwork(lines)
 
-	return 0
+	// a lotta bullshit because the
+
+	computerToVertex := make(map[string]int)
+	vertexToComputer := make(map[int]string)
+	g := graph.NewDense(0, nil)
+
+	v := 0
+	for cn, _ := range n {
+		vertexToComputer[v] = cn
+		computerToVertex[cn] = v
+		v++
+		g.AddVertex(nil)
+	}
+	for _, s := range vertexToComputer {
+		v := computerToVertex[s]
+		c := n.get(s)
+		for _, l := range c.links.ToSlice() {
+			lv := computerToVertex[l.name]
+			g.AddEdge(v, lv)
+		}
+	}
+
+	// not sure how much buffer the channel needs; guessing no more than the size of the vertex, but maybe it's the expected number of cliques
+	cliquechan := make(chan []int, len(vertexToComputer))
+	graph.AllMaximalCliques(g, cliquechan)
+
+	maxSize := 0
+	maxClique := []int{}
+	for clique := range cliquechan {
+		if len(clique) > maxSize {
+			maxClique = clique
+			maxSize = len(clique)
+		}
+	}
+	cliqueNames := []string{}
+	for _, c := range maxClique {
+		cliqueNames = append(cliqueNames, vertexToComputer[c])
+	}
+	sort.Strings(cliqueNames)
+	return strings.Join(cliqueNames, ",")
 }
 
 // input is a set of pairs of computer names that are connected
@@ -88,8 +131,8 @@ func parseComputer(s string) (computer, computer) {
 	return c1, c2
 }
 
-func createNetwork(lines []string) map[string]*computer {
-	network := make(map[string]*computer)
+func createNetwork(lines []string) network {
+	network := make(network)
 	// build all the computers
 	for _, s := range lines {
 		c1, c2 := parseComputer(s)

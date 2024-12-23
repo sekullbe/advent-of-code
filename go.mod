@@ -19,6 +19,7 @@ require (
 )
 
 require (
+	github.com/Tom-Johnston/mamba v0.2.0 // indirect
 	github.com/ctessum/polyclip-go v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gonum/floats v0.0.0-20181209220543-c233463c7e82 // indirect
