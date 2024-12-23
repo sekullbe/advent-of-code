@@ -5,7 +5,7 @@ go 1.23.3
 require (
 	github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482
 	github.com/ctessum/geom v0.2.12
-	github.com/deckarep/golang-set/v2 v2.5.0
+	github.com/deckarep/golang-set/v2 v2.7.0
 	github.com/dominikbraun/graph v0.23.0
 	github.com/mxschmitt/golang-combinations v1.2.0
 	github.com/oleiade/lane/v2 v2.0.0
