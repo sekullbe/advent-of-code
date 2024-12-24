@@ -7,6 +7,7 @@ import (
 	"github.com/sekullbe/advent/parsers"
 	"github.com/sekullbe/advent/tools"
 	"slices"
+	"sort"
 	"strings"
 	"time"
 )
@@ -43,7 +44,7 @@ type wire struct {
 func main() {
 	fmt.Printf("Magic number: %d\n", run1(inputText))
 	fmt.Println("-------------")
-	fmt.Printf("Magic number: %d\n", run2(inputText))
+	fmt.Printf("Magic word: %s\n", run2(inputText))
 }
 
 func run1(input string) int {
@@ -62,10 +63,76 @@ func run1(input string) int {
 	return getOutput(wires)
 }
 
-func run2(input string) int {
+func run2(input string) string {
 	defer tools.Track(time.Now(), "Part 2 Time")
+	segments := parsers.SplitByEmptyNewlineToSlices(input)
+	wires := parseWires(segments[0])
+	gates := parseGates(segments[1])
+	// not all the wires that exist are in the wires segment!
+	// so go through the gates and create invalid wires for each wire not already known
+	completeWires(wires, gates)
 
-	return 0
+	/*
+			taking the idea from here: https://www.reddit.com/r/adventofcode/comments/1hla5ql/2024_day_24_part_2_a_guide_on_the_idea_behind_the/
+			this is a 45-bit adder which has certain structural rules
+		    between that and a followon comment, I extracted four rules, so I just find the 8 rulebreaking gates and collect their outputs
+			luckily, we don't need to _fix_ the thing.
+	*/
+	faultyGateNames := []string{}
+	swappyOutputs := []string{}
+	for _, g := range gates {
+		if g.output[0] == 'z' && g.output != "z45" && g.op != XOR {
+			faultyGateNames = append(faultyGateNames, g.name)
+			swappyOutputs = append(swappyOutputs, g.output)
+			fmt.Printf("%s faulty rule 1, z output from non-XOR\n", g.name)
+		} else if g.output[0] != 'z' && !gateInputsAreXY(g) && g.op == XOR {
+			faultyGateNames = append(faultyGateNames, g.name)
+			swappyOutputs = append(swappyOutputs, g.output)
+			fmt.Printf("%s faulty rule 2, inner gates cannot be XOR\n", g.name)
+		} else if g.op == XOR && gateInputsAreXY(g) {
+			if tools.Contains(g.inputs, "x00") && tools.Contains(g.inputs, "y00") {
+				continue
+			}
+			nextGateExists := false
+			for _, g2 := range gates {
+				nextGateExists = g2.op == XOR && tools.Contains(g2.inputs, g.output)
+				if nextGateExists {
+					break
+				}
+			}
+			if !nextGateExists {
+				faultyGateNames = append(faultyGateNames, g.name)
+				swappyOutputs = append(swappyOutputs, g.output)
+				fmt.Printf("%s faulty rule 3, missing following XOR\n", g.name)
+			}
+		} else if g.op == AND {
+			if tools.Contains(g.inputs, "x00") && tools.Contains(g.inputs, "y00") {
+				continue
+			}
+			nextGateExists := false
+			for _, g2 := range gates {
+				nextGateExists = g2.op == OR && tools.Contains(g2.inputs, g.output)
+				if nextGateExists {
+					break
+				}
+			}
+			if !nextGateExists {
+				faultyGateNames = append(faultyGateNames, g.name)
+				swappyOutputs = append(swappyOutputs, g.output)
+				fmt.Printf("%s faulty rule 4, missing following OR\n", g.name)
+			}
+		}
+	}
+	// extract the wires from the faulty rules
+	//sort.Strings(faultyGateNames)
+	//fmt.Println(faultyGateNames)
+	sort.Strings(swappyOutputs)
+
+	return strings.Join(swappyOutputs, ",")
+}
+
+func gateInputsAreXY(g *gate) bool {
+	return g.inputs[0][0] == 'x' && g.inputs[1][0] == 'y' || g.inputs[0][0] == 'y' && g.inputs[1][0] == 'x'
 }
 
 func completeWires(wires wires, gates gates) {
