@@ -1,13 +1,14 @@
 package tools
 
 import (
-	"golang.org/x/exp/constraints"
 	"log"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/exp/constraints"
 )
 
 type AnyInt interface {
@@ -33,6 +34,15 @@ func ContainsInt(s []int, n int) bool {
 		}
 	}
 	return false
+}
+
+func FirstIntLoc(s []int, n int) (bool, int) {
+	for i, v := range s {
+		if v == n {
+			return true, i
+		}
+	}
+	return false, 0
 }
 
 func ContainsRune(s []rune, r rune) bool {
@@ -114,12 +124,21 @@ func Reverse[E any](s []E) []E {
 	return result
 }
 
-// Sort a slice
+// Sort a slice ascending
 func Sort[E constraints.Ordered](s []E) []E {
 	result := make([]E, len(s))
 	copy(result, s)
 	sort.Slice(result, func(i, j int) bool {
 		return result[i] < result[j]
+	})
+	return result
+}
+
+func SortDesc[E constraints.Ordered](s []E) []E {
+	result := make([]E, len(s))
+	copy(result, s)
+	sort.Slice(result, func(i, j int) bool {
+		return result[i] > result[j]
 	})
 	return result
 }
