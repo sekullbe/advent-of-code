@@ -89,10 +89,9 @@ func maxOutputFromBank(bank []int) int {
 // this can also solve part1 if the max power is parameterized
 func maxOutputFromBank2(bank []int, howMany int) int {
 	sum := 0
-	digit := 9
 	digitLoc := 0
 	for pow := howMany - 1; pow >= 0; pow-- {
-		for i := digit; i >= 0; i-- {
+		for i := 9; i >= 0; i-- {
 			found, loc := tools.FirstIntLoc(bank[digitLoc:len(bank)-pow], i)
 			if found {
 				digitLoc += (loc + 1)
