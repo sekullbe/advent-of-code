@@ -6,11 +6,12 @@ package grid
 import (
 	"errors"
 	"fmt"
+	"io"
+	"os"
+
 	"github.com/sekullbe/advent/geometry"
 	"github.com/sekullbe/advent/parsers"
 	"github.com/sekullbe/advent/tools"
-	"io"
-	"os"
 )
 
 const (
@@ -29,6 +30,7 @@ var DirRunes = map[rune]int{'^': NORTH, '>': EAST, 'v': SOUTH, 'V': SOUTH, '<': 
 var DirRunesBack = map[int]rune{NORTH: '^', EAST: '>', SOUTH: 'v', WEST: '<'}
 
 var FourDirections = [...]int{NORTH, EAST, SOUTH, WEST}
+var EightDirections = [...]int{NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST}
 
 // tile contents
 const EMPTY = '.'
@@ -255,6 +257,17 @@ func (b *Board) FindAll(char rune, excludeEdgeWall bool) []geometry.Point2 {
 	for point, tile := range b.Grid {
 		if tile.Contents == char && (!excludeEdgeWall || !b.PointIsEdgeWall(point)) {
 			points = append(points, point)
+		}
+	}
+	return points
+}
+
+func (b *Board) ReplaceAll(char rune, newchar rune, excludeEdgeWall bool) []geometry.Point2 {
+	points := []geometry.Point2{}
+	for point, tile := range b.Grid {
+		if tile.Contents == char && (!excludeEdgeWall || !b.PointIsEdgeWall(point)) {
+			points = append(points, point)
+			tile.Contents = newchar
 		}
 	}
 	return points

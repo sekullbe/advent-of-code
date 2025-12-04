@@ -18,6 +18,7 @@ func main() {
 
 func run1(input string) int {
 	defer tools.Track(time.Now(), "Part 1 Time")
+
 	return 0
 }
 
