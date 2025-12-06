@@ -71,10 +71,14 @@ func Pt(x, y int) geometry.Point {
 }
 
 func NewTile(p geometry.Point, content rune) Tile {
+	value := 0
+	if content >= '0' && content <= '9' {
+		value = int(content - '0')
+	}
 	return Tile{
 		BaseTile: BaseTile{Point: p},
 		Contents: content,
-		Value:    int(content - '0'),
+		Value:    value,
 	}
 }
 
@@ -98,7 +102,7 @@ func ParseBoard(lines []string) *Board {
 		for x, tc := range line {
 			b.MaxX = max(b.MaxX, x)
 			if tc == ' ' {
-				continue
+				tc = '.' // turn spaces into explicit empty (WARNING this might be a breaking change)
 			}
 			p := Pt(x, y)
 			t := NewTile(p, tc)
@@ -351,4 +355,15 @@ func DirFromTo(from, to geometry.Point2) int {
 		return EAST
 	}
 	return NORTHEAST
+}
+
+// return true if every element in the column with provided X coordinate is blank/empty
+func (b *Board) IsColumnEmpty(x int) bool {
+	for y := range b.MaxY + 1 {
+		t := b.At(x, y)
+		if !IsEmpty(t.Contents) {
+			return false
+		}
+	}
+	return true
 }

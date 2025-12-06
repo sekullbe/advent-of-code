@@ -2,10 +2,11 @@ package grid
 
 import (
 	"bytes"
-	"github.com/sekullbe/advent/geometry"
-	"github.com/sekullbe/advent/parsers"
 	"strings"
 	"testing"
+
+	"github.com/sekullbe/advent/geometry"
+	"github.com/sekullbe/advent/parsers"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -190,4 +191,18 @@ func TestPathToSteps(t *testing.T) {
 			assert.Equalf(t, tt.want, PathToSteps(tt.args.path), "PathToSteps(%v)", tt.args.path)
 		})
 	}
+}
+
+func TestBoard_IsColumnEmpty(t *testing.T) {
+
+	input := `x xx x
+xx x x
+x  x x`
+	b := ParseBoardString(input)
+	assert.False(t, b.IsColumnEmpty(0))
+	assert.False(t, b.IsColumnEmpty(1))
+	assert.False(t, b.IsColumnEmpty(2))
+	assert.False(t, b.IsColumnEmpty(3))
+	assert.True(t, b.IsColumnEmpty(4))
+	assert.False(t, b.IsColumnEmpty(5))
 }
