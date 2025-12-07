@@ -35,6 +35,7 @@ var EightDirections = [...]int{NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWE
 // tile contents
 const EMPTY = '.'
 const WALL = '#'
+const START = 'S'
 
 type Board struct {
 	Grid
@@ -191,6 +192,25 @@ func (b *Board) FprintBoard(w io.Writer) {
 					fmt.Fprint(w, "·")
 				default:
 					fmt.Fprintf(w, "%c", t.Contents)
+				}
+			}
+		}
+		fmt.Fprintln(w)
+	}
+}
+
+func (b *Board) FprintBoardValues(w io.Writer) {
+	for y := 0; y <= b.MaxY; y++ {
+		for x := 0; x <= b.MaxX; x++ {
+			t := b.At(x, y)
+			if t == nil {
+				fmt.Fprint(w, "·"+
+					"")
+			} else {
+				if t.Value <= 0 {
+					fmt.Fprintf(w, "%c", t.Contents)
+				} else {
+					fmt.Fprintf(w, "%X", t.Value)
 				}
 			}
 		}
