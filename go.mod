@@ -3,6 +3,7 @@ module github.com/sekullbe/advent
 go 1.25
 
 require (
+	github.com/Tom-Johnston/mamba v0.2.0
 	github.com/beefsack/go-astar v0.0.0-20200827232313-4ecf9e304482
 	github.com/ctessum/geom v0.2.12
 	github.com/deckarep/golang-set/v2 v2.7.0
@@ -19,7 +20,6 @@ require (
 )
 
 require (
-	github.com/Tom-Johnston/mamba v0.2.0 // indirect
 	github.com/ctessum/polyclip-go v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gonum/floats v0.0.0-20181209220543-c233463c7e82 // indirect

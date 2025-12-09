@@ -4,8 +4,9 @@ package geometry
 // also doesn't use pointers
 
 import (
-	"github.com/sekullbe/advent/tools"
 	"math"
+
+	"github.com/sekullbe/advent/tools"
 )
 
 // Two dimensional point.
@@ -87,4 +88,9 @@ func (p Point3) MovePoint3(dx, dy, dz int) Point3 {
 // offset is what you have to add to A to get to B
 func CalculateOffsets(a, b Point2) (x, y int) {
 	return b.X - a.X, b.Y - a.Y
+}
+
+// Area of a rectangle with these points in opposite corners
+func Area(a, b Point2) int {
+	return (tools.AbsInt((a.X - b.X)) + 1) * (tools.AbsInt((a.Y - b.Y)) + 1)
 }

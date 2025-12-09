@@ -382,3 +382,25 @@ func TestPoint2_Add(t *testing.T) {
 		})
 	}
 }
+
+func TestArea(t *testing.T) {
+	type args struct {
+		a Point2
+		b Point2
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "1,1-3,3", args: args{a: Point2{1, 1}, b: Point2{3, 3}}, want: 9},
+		{name: "3,5-13,7", args: args{a: Point2{3, 5}, b: Point2{13, 7}}, want: 33},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Area(tt.args.a, tt.args.b); got != tt.want {
+				t.Errorf("Area() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
