@@ -8,6 +8,7 @@ require (
 	github.com/ctessum/geom v0.2.12
 	github.com/deckarep/golang-set/v2 v2.7.0
 	github.com/dominikbraun/graph v0.23.0
+	github.com/draffensperger/golp v0.0.0-20250721104811-2d405f0b4e68
 	github.com/mxschmitt/golang-combinations v1.2.0
 	github.com/oleiade/lane/v2 v2.0.0
 	github.com/oleiade/reflections v1.0.1
