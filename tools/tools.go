@@ -105,7 +105,7 @@ func Track(start time.Time, msg string) {
 
 // Generic tools, from https://bitfieldconsulting.com/golang/functional
 
-// Contains returns true if the slice contains the value
+// Contains returns true if the slice contains the value - redundant with slices.Contains
 func Contains[E comparable](s []E, v E) bool {
 	for _, vs := range s {
 		if v == vs {
